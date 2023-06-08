@@ -1,0 +1,3723 @@
+diff --git a/cli/args/config_file.rs b/cli/args/config_file.rs
+index 61f7778..5a6e6ea 100644
+--- a/cli/args/config_file.rs
++++ b/cli/args/config_file.rs
+@@ -6,17 +6,17 @@ use crate::util::fs::canonicalize_path;
+ use crate::util::path::specifier_parent;
+ use crate::util::path::specifier_to_file_path;
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde::Serializer;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde::Serializer;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::ModuleSpecifier;
+ use indexmap::IndexMap;
+ use std::borrow::Cow;
+ use std::collections::BTreeMap;
+@@ -1257,7 +1257,7 @@ impl From<TsConfig> for deno_ast::EmitOptions {
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::serde_json::json;
++  use ::deno_core::serde_json::json;
+   use pretty_assertions::assert_eq;
+ 
+   fn unpack_object<T>(result: Result<Option<T>, AnyError>, name: &str) -> T {
+diff --git a/cli/args/flags.rs b/cli/args/flags.rs
+index c4d8a3f..adef0c1 100644
+--- a/cli/args/flags.rs
++++ b/cli/args/flags.rs
+@@ -7,9 +7,9 @@ use clap::ArgMatches;
+ use clap::ColorChoice;
+ use clap::Command;
+ use clap::ValueHint;
+-use deno_core::resolve_url_or_path;
+-use deno_core::url::Url;
+-use deno_runtime::permissions::parse_sys_kind;
++use ::deno_core::resolve_url_or_path;
++use ::deno_core::url::Url;
++use ::deno_runtime::permissions::parse_sys_kind;
+ use log::debug;
+ use log::Level;
+ use std::env;
+diff --git a/cli/args/flags_allow_net.rs b/cli/args/flags_allow_net.rs
+index 9f8a6b9..e6e5c45 100644
+--- a/cli/args/flags_allow_net.rs
++++ b/cli/args/flags_allow_net.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::url::Url;
++use ::deno_core::url::Url;
+ use std::net::IpAddr;
+ use std::str::FromStr;
+ 
+diff --git a/cli/args/import_map.rs b/cli/args/import_map.rs
+index 9d1b2bb..2bdef60 100644
+--- a/cli/args/import_map.rs
++++ b/cli/args/import_map.rs
+@@ -1,9 +1,9 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use import_map::ImportMap;
+ use import_map::ImportMapDiagnostic;
+ use log::warn;
+diff --git a/cli/args/lockfile.rs b/cli/args/lockfile.rs
+index c54fdcd..45ebe3f 100644
+--- a/cli/args/lockfile.rs
++++ b/cli/args/lockfile.rs
+@@ -4,18 +4,18 @@ use std::collections::HashMap;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::futures::stream::FuturesOrdered;
+-use deno_core::futures::StreamExt;
+-use deno_core::parking_lot::Mutex;
+-use deno_npm::registry::NpmRegistryApi;
+-use deno_npm::resolution::SerializedNpmResolutionSnapshot;
+-use deno_npm::resolution::SerializedNpmResolutionSnapshotPackage;
+-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+-use deno_npm::NpmPackageId;
+-use deno_semver::npm::NpmPackageReq;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::stream::FuturesOrdered;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_npm::registry::NpmRegistryApi;
++use ::deno_npm::resolution::SerializedNpmResolutionSnapshot;
++use ::deno_npm::resolution::SerializedNpmResolutionSnapshotPackage;
++use ::deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmPackageId;
++use ::deno_semver::npm::NpmPackageReq;
+ 
+ use crate::args::ConfigFile;
+ use crate::npm::CliNpmRegistryApi;
+@@ -23,8 +23,8 @@ use crate::Flags;
+ 
+ use super::DenoSubcommand;
+ 
+-pub use deno_lockfile::Lockfile;
+-pub use deno_lockfile::LockfileError;
++pub use ::deno_lockfile::Lockfile;
++pub use ::deno_lockfile::LockfileError;
+ 
+ pub fn discover(
+   flags: &Flags,
+diff --git a/cli/args/mod.rs b/cli/args/mod.rs
+index 6dab0c9..593f004 100644
+--- a/cli/args/mod.rs
++++ b/cli/args/mod.rs
+@@ -11,11 +11,11 @@ pub use self::import_map::resolve_import_map_from_specifier;
+ pub use self::lockfile::snapshot_from_lockfile;
+ use self::package_json::PackageJsonDeps;
+ use ::import_map::ImportMap;
+-use deno_core::resolve_url_or_path;
+-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_core::resolve_url_or_path;
++use ::deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use indexmap::IndexMap;
+ 
+ pub use config_file::BenchConfig;
+@@ -36,24 +36,24 @@ pub use lockfile::Lockfile;
+ pub use lockfile::LockfileError;
+ pub use package_json::PackageJsonDepsProvider;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::normalize_path;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
+-use deno_runtime::colors;
+-use deno_runtime::deno_node::PackageJson;
+-use deno_runtime::deno_tls::rustls;
+-use deno_runtime::deno_tls::rustls::RootCertStore;
+-use deno_runtime::deno_tls::rustls_native_certs::load_native_certs;
+-use deno_runtime::deno_tls::rustls_pemfile;
+-use deno_runtime::deno_tls::webpki_roots;
+-use deno_runtime::inspector_server::InspectorServer;
+-use deno_runtime::permissions::PermissionsOptions;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::normalize_path;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
++use ::deno_runtime::colors;
++use ::deno_runtime::deno_node::PackageJson;
++use ::deno_runtime::deno_tls::rustls;
++use ::deno_runtime::deno_tls::rustls::RootCertStore;
++use ::deno_runtime::deno_tls::rustls_native_certs::load_native_certs;
++use ::deno_runtime::deno_tls::rustls_pemfile;
++use ::deno_runtime::deno_tls::webpki_roots;
++use ::deno_runtime::inspector_server::InspectorServer;
++use ::deno_runtime::permissions::PermissionsOptions;
+ use once_cell::sync::Lazy;
+ use once_cell::sync::OnceCell;
+ use std::collections::HashMap;
+diff --git a/cli/args/package_json.rs b/cli/args/package_json.rs
+index a8c6eaa..0540ce1 100644
+--- a/cli/args/package_json.rs
++++ b/cli/args/package_json.rs
+@@ -5,14 +5,14 @@ use std::collections::HashMap;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_npm::registry::parse_dep_entry_name_and_raw_version;
+-use deno_npm::registry::PackageDepNpmSchemeValueParseError;
+-use deno_runtime::deno_node::PackageJson;
+-use deno_semver::npm::NpmPackageReq;
+-use deno_semver::npm::NpmVersionReqSpecifierParseError;
+-use deno_semver::VersionReq;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_npm::registry::parse_dep_entry_name_and_raw_version;
++use ::deno_npm::registry::PackageDepNpmSchemeValueParseError;
++use ::deno_runtime::deno_node::PackageJson;
++use ::deno_semver::npm::NpmPackageReq;
++use ::deno_semver::npm::NpmVersionReqSpecifierParseError;
++use ::deno_semver::VersionReq;
+ use thiserror::Error;
+ 
+ #[derive(Debug, Error, Clone)]
+diff --git a/cli/auth_tokens.rs b/cli/auth_tokens.rs
+index 6c3ed38..4e8a4d4 100644
+--- a/cli/auth_tokens.rs
++++ b/cli/auth_tokens.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::ModuleSpecifier;
++use ::deno_core::ModuleSpecifier;
+ use log::debug;
+ use log::error;
+ use std::fmt;
+@@ -96,7 +96,7 @@ impl AuthTokens {
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::resolve_url;
++  use ::deno_core::resolve_url;
+ 
+   #[test]
+   fn test_auth_token() {
+diff --git a/cli/bench/lsp.rs b/cli/bench/lsp.rs
+index a449c93..12aed83 100644
+--- a/cli/bench/lsp.rs
++++ b/cli/bench/lsp.rs
+@@ -1,10 +1,10 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::serde::Deserialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::url::Url;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::url::Url;
+ use std::collections::HashMap;
+ use std::path::Path;
+ use std::time::Duration;
+diff --git a/cli/bench/lsp_bench_standalone.rs b/cli/bench/lsp_bench_standalone.rs
+index b3b1f2d..b433f38 100644
+--- a/cli/bench/lsp_bench_standalone.rs
++++ b/cli/bench/lsp_bench_standalone.rs
+@@ -1,10 +1,10 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_bench_util::bencher::benchmark_group;
+-use deno_bench_util::bencher::benchmark_main;
+-use deno_bench_util::bencher::Bencher;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
++use ::deno_bench_util::bencher::benchmark_group;
++use ::deno_bench_util::bencher::benchmark_main;
++use ::deno_bench_util::bencher::Bencher;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
+ use test_util::lsp::LspClient;
+ use test_util::lsp::LspClientBuilder;
+ 
+diff --git a/cli/bench/main.rs b/cli/bench/main.rs
+index 721cf06..071b4ea 100644
+--- a/cli/bench/main.rs
++++ b/cli/bench/main.rs
+@@ -1,8 +1,8 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
+ use std::collections::HashMap;
+ use std::convert::From;
+ use std::env;
+diff --git a/cli/build.rs b/cli/build.rs
+index 78a9c56..f9a1f29 100644
+--- a/cli/build.rs
++++ b/cli/build.rs
+@@ -4,23 +4,23 @@ use std::env;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_core::snapshot_util::*;
+-use deno_core::Extension;
+-use deno_core::ExtensionFileSource;
+-use deno_core::ExtensionFileSourceCode;
+-use deno_runtime::deno_cache::SqliteBackedCache;
+-use deno_runtime::deno_http::DefaultHttpPropertyExtractor;
+-use deno_runtime::deno_kv::sqlite::SqliteDbHandler;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_runtime::*;
++use ::deno_core::snapshot_util::*;
++use ::deno_core::Extension;
++use ::deno_core::ExtensionFileSource;
++use ::deno_core::ExtensionFileSourceCode;
++use ::deno_runtime::deno_cache::SqliteBackedCache;
++use ::deno_runtime::deno_http::DefaultHttpPropertyExtractor;
++use ::deno_runtime::deno_kv::sqlite::SqliteDbHandler;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_runtime::*;
+ 
+ mod ts {
+   use super::*;
+-  use deno_core::error::custom_error;
+-  use deno_core::error::AnyError;
+-  use deno_core::op;
+-  use deno_core::OpState;
+-  use deno_runtime::deno_node::SUPPORTED_BUILTIN_NODE_MODULES;
++  use ::deno_core::error::custom_error;
++  use ::deno_core::error::AnyError;
++  use ::deno_core::op;
++  use ::deno_core::OpState;
++  use ::deno_runtime::deno_node::SUPPORTED_BUILTIN_NODE_MODULES;
+   use serde::Deserialize;
+   use serde_json::json;
+   use serde_json::Value;
+diff --git a/cli/cache/cache_db.rs b/cli/cache/cache_db.rs
+index fd69406..f157331 100644
+--- a/cli/cache/cache_db.rs
++++ b/cli/cache/cache_db.rs
+@@ -1,13 +1,13 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::parking_lot::MutexGuard;
+-use deno_core::task::spawn_blocking;
+-use deno_runtime::deno_webstorage::rusqlite;
+-use deno_runtime::deno_webstorage::rusqlite::Connection;
+-use deno_runtime::deno_webstorage::rusqlite::OptionalExtension;
+-use deno_runtime::deno_webstorage::rusqlite::Params;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::parking_lot::MutexGuard;
++use ::deno_core::task::spawn_blocking;
++use ::deno_runtime::deno_webstorage::rusqlite;
++use ::deno_runtime::deno_webstorage::rusqlite::Connection;
++use ::deno_runtime::deno_webstorage::rusqlite::OptionalExtension;
++use ::deno_runtime::deno_webstorage::rusqlite::Params;
+ use once_cell::sync::OnceCell;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+diff --git a/cli/cache/check.rs b/cli/cache/check.rs
+index bf71380..5d035aa 100644
+--- a/cli/cache/check.rs
++++ b/cli/cache/check.rs
+@@ -3,9 +3,9 @@
+ use super::cache_db::CacheDB;
+ use super::cache_db::CacheDBConfiguration;
+ use super::cache_db::CacheFailure;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_runtime::deno_webstorage::rusqlite::params;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_runtime::deno_webstorage::rusqlite::params;
+ 
+ pub static TYPE_CHECK_CACHE_DB: CacheDBConfiguration = CacheDBConfiguration {
+   table_initializer: concat!(
+diff --git a/cli/cache/disk_cache.rs b/cli/cache/disk_cache.rs
+index 0420644..6d0437a 100644
+--- a/cli/cache/disk_cache.rs
++++ b/cli/cache/disk_cache.rs
+@@ -4,8 +4,8 @@ use super::http_cache::url_to_filename;
+ use super::CACHE_PERM;
+ use crate::util::fs::atomic_write_file;
+ 
+-use deno_core::url::Host;
+-use deno_core::url::Url;
++use ::deno_core::url::Host;
++use ::deno_core::url::Url;
+ use std::ffi::OsStr;
+ use std::fs;
+ use std::io;
+diff --git a/cli/cache/emit.rs b/cli/cache/emit.rs
+index dd7b9e6..1532bc1 100644
+--- a/cli/cache/emit.rs
++++ b/cli/cache/emit.rs
+@@ -2,10 +2,10 @@
+ 
+ use std::path::PathBuf;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
+ use serde::Deserialize;
+ use serde::Serialize;
+ 
+diff --git a/cli/cache/http_cache.rs b/cli/cache/http_cache.rs
+index b10c597..8dc7156 100644
+--- a/cli/cache/http_cache.rs
++++ b/cli/cache/http_cache.rs
+@@ -5,12 +5,12 @@
+ //! at hand.
+ use crate::http_util::HeadersMap;
+ use crate::util;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
+ use std::fs;
+ use std::fs::File;
+ use std::io;
+diff --git a/cli/cache/incremental.rs b/cli/cache/incremental.rs
+index c50b876..d75f0e4 100644
+--- a/cli/cache/incremental.rs
++++ b/cli/cache/incremental.rs
+@@ -4,12 +4,12 @@ use std::collections::HashMap;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
+-use deno_core::task::spawn;
+-use deno_core::task::JoinHandle;
+-use deno_runtime::deno_webstorage::rusqlite::params;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
++use ::deno_core::task::spawn;
++use ::deno_core::task::JoinHandle;
++use ::deno_runtime::deno_webstorage::rusqlite::params;
+ use serde::Serialize;
+ 
+ use super::cache_db::CacheDB;
+diff --git a/cli/cache/mod.rs b/cli/cache/mod.rs
+index 772ba10..b4d764c 100644
+--- a/cli/cache/mod.rs
++++ b/cli/cache/mod.rs
+@@ -3,14 +3,14 @@
+ use crate::errors::get_error_class_name;
+ use crate::file_fetcher::FileFetcher;
+ 
+-use deno_core::futures;
+-use deno_core::futures::FutureExt;
+-use deno_core::ModuleSpecifier;
+-use deno_graph::source::CacheInfo;
+-use deno_graph::source::LoadFuture;
+-use deno_graph::source::LoadResponse;
+-use deno_graph::source::Loader;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::futures;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::ModuleSpecifier;
++use ::deno_graph::source::CacheInfo;
++use ::deno_graph::source::LoadFuture;
++use ::deno_graph::source::LoadResponse;
++use ::deno_graph::source::Loader;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use std::collections::HashMap;
+ use std::sync::Arc;
+ 
+@@ -29,8 +29,8 @@ mod parsed_source;
+ pub use caches::Caches;
+ pub use check::TypeCheckCache;
+ pub use common::FastInsecureHasher;
+-pub use deno_dir::DenoDir;
+-pub use deno_dir::DenoDirProvider;
++pub use self::deno_dir::DenoDir;
++pub use self::deno_dir::DenoDirProvider;
+ pub use disk_cache::DiskCache;
+ pub use emit::EmitCache;
+ pub use http_cache::CachedUrlMetadata;
+diff --git a/cli/cache/node.rs b/cli/cache/node.rs
+index 298d81e..b5ad546 100644
+--- a/cli/cache/node.rs
++++ b/cli/cache/node.rs
+@@ -1,9 +1,9 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_ast::CjsAnalysis;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_runtime::deno_webstorage::rusqlite::params;
++use ::deno_ast::CjsAnalysis;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_runtime::deno_webstorage::rusqlite::params;
+ 
+ use super::cache_db::CacheDB;
+ use super::cache_db::CacheDBConfiguration;
+diff --git a/cli/cache/parsed_source.rs b/cli/cache/parsed_source.rs
+index 0cac4af..5649832 100644
+--- a/cli/cache/parsed_source.rs
++++ b/cli/cache/parsed_source.rs
+@@ -3,17 +3,17 @@
+ use std::collections::HashMap;
+ use std::sync::Arc;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_ast::ParsedSource;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
+-use deno_graph::CapturingModuleParser;
+-use deno_graph::DefaultModuleAnalyzer;
+-use deno_graph::ModuleInfo;
+-use deno_graph::ModuleParser;
+-use deno_runtime::deno_webstorage::rusqlite::params;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_ast::ParsedSource;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
++use ::deno_graph::CapturingModuleParser;
++use ::deno_graph::DefaultModuleAnalyzer;
++use ::deno_graph::ModuleInfo;
++use ::deno_graph::ModuleParser;
++use ::deno_runtime::deno_webstorage::rusqlite::params;
+ 
+ use super::cache_db::CacheDB;
+ use super::cache_db::CacheDBConfiguration;
+@@ -271,8 +271,8 @@ fn compute_source_hash(bytes: &[u8]) -> String {
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_graph::PositionRange;
+-  use deno_graph::SpecifierWithRange;
++  use ::deno_graph::PositionRange;
++  use ::deno_graph::SpecifierWithRange;
+ 
+   use super::*;
+ 
+diff --git a/cli/emit.rs b/cli/emit.rs
+index 6d34195..bb8fa46 100644
+--- a/cli/emit.rs
++++ b/cli/emit.rs
+@@ -4,12 +4,12 @@ use crate::cache::EmitCache;
+ use crate::cache::FastInsecureHasher;
+ use crate::cache::ParsedSourceCache;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::ModuleCode;
+-use deno_core::ModuleSpecifier;
+-use deno_graph::MediaType;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
++use ::deno_core::error::AnyError;
++use ::deno_core::ModuleCode;
++use ::deno_core::ModuleSpecifier;
++use ::deno_graph::MediaType;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
+ use std::sync::Arc;
+ 
+ pub struct Emitter {
+diff --git a/cli/errors.rs b/cli/errors.rs
+index 2ffad73..e1ef24e 100644
+--- a/cli/errors.rs
++++ b/cli/errors.rs
+@@ -9,11 +9,11 @@
+ //!   Diagnostics are compile-time type errors, whereas JsErrors are runtime
+ //!   exceptions.
+ 
+-use deno_ast::Diagnostic;
+-use deno_core::error::AnyError;
+-use deno_graph::ModuleError;
+-use deno_graph::ModuleGraphError;
+-use deno_graph::ResolutionError;
++use ::deno_ast::Diagnostic;
++use ::deno_core::error::AnyError;
++use ::deno_graph::ModuleError;
++use ::deno_graph::ModuleGraphError;
++use ::deno_graph::ResolutionError;
+ use import_map::ImportMapError;
+ 
+ fn get_import_map_error_class(_: &ImportMapError) -> &'static str {
+diff --git a/cli/factory.rs b/cli/factory.rs
+index 8e20e55..0121c4f 100644
+--- a/cli/factory.rs
++++ b/cli/factory.rs
+@@ -44,16 +44,16 @@ use crate::worker::CliMainWorkerFactory;
+ use crate::worker::CliMainWorkerOptions;
+ use crate::worker::HasNodeSpecifierChecker;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
+ 
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node::analyze::NodeCodeTranslator;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
+-use deno_runtime::deno_web::BlobStore;
+-use deno_runtime::inspector_server::InspectorServer;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node::analyze::NodeCodeTranslator;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_runtime::deno_web::BlobStore;
++use ::deno_runtime::inspector_server::InspectorServer;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use import_map::ImportMap;
+ use log::warn;
+ use std::cell::RefCell;
+diff --git a/cli/file_fetcher.rs b/cli/file_fetcher.rs
+index 71d284e..1c0b3c4 100644
+--- a/cli/file_fetcher.rs
++++ b/cli/file_fetcher.rs
+@@ -15,23 +15,23 @@ use crate::util::progress_bar::UpdateGuard;
+ use crate::util::text_encoding;
+ 
+ use data_url::DataUrl;
+-use deno_ast::MediaType;
+-use deno_core::error::custom_error;
+-use deno_core::error::generic_error;
+-use deno_core::error::uri_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures;
+-use deno_core::futures::future::FutureExt;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::url::Url;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::deno_fetch::reqwest::header::HeaderValue;
+-use deno_runtime::deno_fetch::reqwest::header::ACCEPT;
+-use deno_runtime::deno_fetch::reqwest::header::AUTHORIZATION;
+-use deno_runtime::deno_fetch::reqwest::header::IF_NONE_MATCH;
+-use deno_runtime::deno_fetch::reqwest::StatusCode;
+-use deno_runtime::deno_web::BlobStore;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_ast::MediaType;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::uri_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures;
++use ::deno_core::futures::future::FutureExt;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::url::Url;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::deno_fetch::reqwest::header::HeaderValue;
++use ::deno_runtime::deno_fetch::reqwest::header::ACCEPT;
++use ::deno_runtime::deno_fetch::reqwest::header::AUTHORIZATION;
++use ::deno_runtime::deno_fetch::reqwest::header::IF_NONE_MATCH;
++use ::deno_runtime::deno_fetch::reqwest::StatusCode;
++use ::deno_runtime::deno_web::BlobStore;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use log::debug;
+ use std::borrow::Borrow;
+ use std::collections::HashMap;
+@@ -740,13 +740,13 @@ mod tests {
+   use crate::version;
+ 
+   use super::*;
+-  use deno_core::error::get_custom_error_class;
+-  use deno_core::resolve_url;
+-  use deno_core::url::Url;
+-  use deno_runtime::deno_fetch::create_http_client;
+-  use deno_runtime::deno_fetch::CreateHttpClientOptions;
+-  use deno_runtime::deno_web::Blob;
+-  use deno_runtime::deno_web::InMemoryBlobPart;
++  use ::deno_core::error::get_custom_error_class;
++  use ::deno_core::resolve_url;
++  use ::deno_core::url::Url;
++  use ::deno_runtime::deno_fetch::create_http_client;
++  use ::deno_runtime::deno_fetch::CreateHttpClientOptions;
++  use ::deno_runtime::deno_web::Blob;
++  use ::deno_runtime::deno_web::InMemoryBlobPart;
+   use std::fs::read;
+   use test_util::TempDir;
+ 
+@@ -2016,8 +2016,8 @@ mod tests {
+   #[tokio::test]
+   #[ignore] // https://github.com/denoland/deno/issues/12561
+   async fn test_fetch_with_empty_certificate_store() {
+-    use deno_runtime::deno_tls::rustls::RootCertStore;
+-    use deno_runtime::deno_tls::RootCertStoreProvider;
++    use ::deno_runtime::deno_tls::rustls::RootCertStore;
++    use ::deno_runtime::deno_tls::RootCertStoreProvider;
+ 
+     struct ValueRootCertStoreProvider(RootCertStore);
+ 
+diff --git a/cli/graph_util.rs b/cli/graph_util.rs
+index 976c2ae..b84ff65 100644
+--- a/cli/graph_util.rs
++++ b/cli/graph_util.rs
+@@ -14,23 +14,23 @@ use crate::resolver::CliGraphResolver;
+ use crate::tools::check;
+ use crate::tools::check::TypeChecker;
+ 
+-use deno_core::anyhow::bail;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::parking_lot::RwLock;
+-use deno_core::ModuleSpecifier;
+-use deno_core::TaskQueue;
+-use deno_core::TaskQueuePermit;
+-use deno_graph::source::Loader;
+-use deno_graph::Module;
+-use deno_graph::ModuleError;
+-use deno_graph::ModuleGraph;
+-use deno_graph::ModuleGraphError;
+-use deno_graph::ResolutionError;
+-use deno_graph::SpecifierError;
+-use deno_runtime::deno_node;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::parking_lot::RwLock;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::TaskQueue;
++use ::deno_core::TaskQueuePermit;
++use ::deno_graph::source::Loader;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleError;
++use ::deno_graph::ModuleGraph;
++use ::deno_graph::ModuleGraphError;
++use ::deno_graph::ResolutionError;
++use ::deno_graph::SpecifierError;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use import_map::ImportMapError;
+ use std::collections::HashMap;
+ use std::collections::HashSet;
+@@ -511,11 +511,11 @@ impl<'a> ModuleGraphUpdatePermit<'a> {
+ mod test {
+   use std::sync::Arc;
+ 
+-  use deno_ast::ModuleSpecifier;
+-  use deno_graph::Position;
+-  use deno_graph::Range;
+-  use deno_graph::ResolutionError;
+-  use deno_graph::SpecifierError;
++  use ::deno_ast::ModuleSpecifier;
++  use ::deno_graph::Position;
++  use ::deno_graph::Range;
++  use ::deno_graph::ResolutionError;
++  use ::deno_graph::SpecifierError;
+ 
+   use crate::graph_util::get_resolution_error_bare_node_specifier;
+ 
+diff --git a/cli/http_util.rs b/cli/http_util.rs
+index e90e0ee..696002d 100644
+--- a/cli/http_util.rs
++++ b/cli/http_util.rs
+@@ -5,18 +5,18 @@ use crate::version::get_user_agent;
+ use cache_control::Cachability;
+ use cache_control::CacheControl;
+ use chrono::DateTime;
+-use deno_core::anyhow::bail;
+-use deno_core::error::custom_error;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures::StreamExt;
+-use deno_core::url::Url;
+-use deno_runtime::deno_fetch::create_http_client;
+-use deno_runtime::deno_fetch::reqwest;
+-use deno_runtime::deno_fetch::reqwest::header::LOCATION;
+-use deno_runtime::deno_fetch::reqwest::Response;
+-use deno_runtime::deno_fetch::CreateHttpClientOptions;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::url::Url;
++use ::deno_runtime::deno_fetch::create_http_client;
++use ::deno_runtime::deno_fetch::reqwest;
++use ::deno_runtime::deno_fetch::reqwest::header::LOCATION;
++use ::deno_runtime::deno_fetch::reqwest::Response;
++use ::deno_runtime::deno_fetch::CreateHttpClientOptions;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
+ use std::collections::HashMap;
+ use std::sync::Arc;
+ use std::time::Duration;
+diff --git a/cli/js.rs b/cli/js.rs
+index e3a5b94..70a1444 100644
+--- a/cli/js.rs
++++ b/cli/js.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::Snapshot;
++use ::deno_core::Snapshot;
+ use log::debug;
+ 
+ static CLI_SNAPSHOT: &[u8] =
+diff --git a/cli/lsp/analysis.rs b/cli/lsp/analysis.rs
+index a5ebbbb..052ec11 100644
+--- a/cli/lsp/analysis.rs
++++ b/cli/lsp/analysis.rs
+@@ -7,16 +7,16 @@ use super::tsc;
+ 
+ use crate::tools::lint::create_linter;
+ 
+-use deno_ast::SourceRange;
+-use deno_ast::SourceRangedForSpanned;
+-use deno_ast::SourceTextInfo;
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde_json::json;
+-use deno_core::ModuleSpecifier;
+-use deno_lint::rules::LintRule;
++use ::deno_ast::SourceRange;
++use ::deno_ast::SourceRangedForSpanned;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde_json::json;
++use ::deno_core::ModuleSpecifier;
++use ::deno_lint::rules::LintRule;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+ use std::cmp::Ordering;
+diff --git a/cli/lsp/cache.rs b/cli/lsp/cache.rs
+index f047e5f..50c0af2 100644
+--- a/cli/lsp/cache.rs
++++ b/cli/lsp/cache.rs
+@@ -3,8 +3,8 @@
+ use crate::cache::CachedUrlMetadata;
+ use crate::cache::HttpCache;
+ 
+-use deno_core::parking_lot::Mutex;
+-use deno_core::ModuleSpecifier;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::ModuleSpecifier;
+ use std::collections::HashMap;
+ use std::fs;
+ use std::path::Path;
+diff --git a/cli/lsp/capabilities.rs b/cli/lsp/capabilities.rs
+index e56aa6b..34a091f 100644
+--- a/cli/lsp/capabilities.rs
++++ b/cli/lsp/capabilities.rs
+@@ -5,7 +5,7 @@
+ ///! language server, which helps determine what messages are sent from the
+ ///! client.
+ ///!
+-use deno_core::serde_json::json;
++use ::deno_core::serde_json::json;
+ use tower_lsp::lsp_types::*;
+ 
+ use super::refactor::ALL_KNOWN_REFACTOR_ACTION_KINDS;
+diff --git a/cli/lsp/client.rs b/cli/lsp/client.rs
+index 5f1a7fc..209e3c9 100644
+--- a/cli/lsp/client.rs
++++ b/cli/lsp/client.rs
+@@ -3,12 +3,12 @@
+ use std::sync::Arc;
+ 
+ use async_trait::async_trait;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
+-use deno_core::task::spawn;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::task::spawn;
+ use tower_lsp::lsp_types as lsp;
+ use tower_lsp::lsp_types::ConfigurationItem;
+ 
+diff --git a/cli/lsp/code_lens.rs b/cli/lsp/code_lens.rs
+index c451e30..fafe610 100644
+--- a/cli/lsp/code_lens.rs
++++ b/cli/lsp/code_lens.rs
+@@ -8,19 +8,19 @@ use super::text::LineIndex;
+ use super::tsc;
+ use super::tsc::NavigationTree;
+ 
+-use deno_ast::swc::ast;
+-use deno_ast::swc::visit::Visit;
+-use deno_ast::swc::visit::VisitWith;
+-use deno_ast::ParsedSource;
+-use deno_ast::SourceRange;
+-use deno_ast::SourceRangedForSpanned;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::ModuleSpecifier;
++use ::deno_ast::swc::ast;
++use ::deno_ast::swc::visit::Visit;
++use ::deno_ast::swc::visit::VisitWith;
++use ::deno_ast::ParsedSource;
++use ::deno_ast::SourceRange;
++use ::deno_ast::SourceRangedForSpanned;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::ModuleSpecifier;
+ use lazy_regex::lazy_regex;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+@@ -539,8 +539,8 @@ async fn collect_tsc(
+ 
+ #[cfg(test)]
+ mod tests {
+-  use deno_ast::MediaType;
+-  use deno_ast::SourceTextInfo;
++  use ::deno_ast::MediaType;
++  use ::deno_ast::SourceTextInfo;
+ 
+   use super::*;
+ 
+diff --git a/cli/lsp/completions.rs b/cli/lsp/completions.rs
+index 070e316..9610ec7 100644
+--- a/cli/lsp/completions.rs
++++ b/cli/lsp/completions.rs
+@@ -12,15 +12,15 @@ use crate::util::path::is_supported_ext;
+ use crate::util::path::relative_specifier;
+ use crate::util::path::specifier_to_file_path;
+ 
+-use deno_ast::LineAndColumnIndex;
+-use deno_ast::SourceTextInfo;
+-use deno_core::normalize_path;
+-use deno_core::resolve_path;
+-use deno_core::resolve_url;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::url::Position;
+-use deno_core::ModuleSpecifier;
++use ::deno_ast::LineAndColumnIndex;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::normalize_path;
++use ::deno_core::resolve_path;
++use ::deno_core::resolve_url;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::url::Position;
++use ::deno_core::ModuleSpecifier;
+ use import_map::ImportMap;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+@@ -508,8 +508,8 @@ mod tests {
+   use crate::cache::HttpCache;
+   use crate::lsp::documents::Documents;
+   use crate::lsp::documents::LanguageId;
+-  use deno_core::resolve_url;
+-  use deno_graph::Range;
++  use ::deno_core::resolve_url;
++  use ::deno_graph::Range;
+   use std::collections::HashMap;
+   use std::path::Path;
+   use test_util::TempDir;
+diff --git a/cli/lsp/config.rs b/cli/lsp/config.rs
+index 0a25e2b..9cbf712 100644
+--- a/cli/lsp/config.rs
++++ b/cli/lsp/config.rs
+@@ -2,12 +2,12 @@
+ 
+ use super::logging::lsp_log;
+ use crate::util::path::specifier_to_file_path;
+-use deno_core::error::AnyError;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
+-use deno_core::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::ModuleSpecifier;
+ use lsp::Url;
+ use std::collections::BTreeMap;
+ use std::collections::HashMap;
+@@ -665,8 +665,8 @@ impl Config {
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::resolve_url;
+-  use deno_core::serde_json::json;
++  use ::deno_core::resolve_url;
++  use ::deno_core::serde_json::json;
+   use pretty_assertions::assert_eq;
+ 
+   #[test]
+diff --git a/cli/lsp/diagnostics.rs b/cli/lsp/diagnostics.rs
+index 6af6c92..a7ed2e6 100644
+--- a/cli/lsp/diagnostics.rs
++++ b/cli/lsp/diagnostics.rs
+@@ -19,23 +19,23 @@ use crate::graph_util::enhanced_resolution_error_message;
+ use crate::lsp::lsp_custom::DiagnosticBatchNotificationParams;
+ use crate::tools::lint::get_configured_rules;
+ 
+-use deno_ast::MediaType;
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::task::spawn;
+-use deno_core::task::JoinHandle;
+-use deno_core::ModuleSpecifier;
+-use deno_graph::Resolution;
+-use deno_graph::ResolutionError;
+-use deno_graph::SpecifierError;
+-use deno_lint::rules::LintRule;
+-use deno_runtime::deno_node;
+-use deno_runtime::tokio_util::create_basic_runtime;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::task::spawn;
++use ::deno_core::task::JoinHandle;
++use ::deno_core::ModuleSpecifier;
++use ::deno_graph::Resolution;
++use ::deno_graph::ResolutionError;
++use ::deno_graph::SpecifierError;
++use ::deno_lint::rules::LintRule;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::tokio_util::create_basic_runtime;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use log::error;
+ use std::collections::HashMap;
+ use std::sync::atomic::AtomicUsize;
+diff --git a/cli/lsp/documents.rs b/cli/lsp/documents.rs
+index d088e01..8659210 100644
+--- a/cli/lsp/documents.rs
++++ b/cli/lsp/documents.rs
+@@ -23,25 +23,25 @@ use crate::resolver::CliGraphResolver;
+ use crate::util::path::specifier_to_file_path;
+ use crate::util::text_encoding;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ParsedSource;
+-use deno_ast::SourceTextInfo;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures::future;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::url;
+-use deno_core::ModuleSpecifier;
+-use deno_graph::GraphImport;
+-use deno_graph::Resolution;
+-use deno_runtime::deno_node;
+-use deno_runtime::deno_node::NodeResolution;
+-use deno_runtime::deno_node::NodeResolutionMode;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::deno_node::PackageJson;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_semver::npm::NpmPackageReq;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::MediaType;
++use ::deno_ast::ParsedSource;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::future;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::url;
++use ::deno_core::ModuleSpecifier;
++use ::deno_graph::GraphImport;
++use ::deno_graph::Resolution;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::deno_node::NodeResolution;
++use ::deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::deno_node::PackageJson;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_semver::npm::NpmPackageReq;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use indexmap::IndexMap;
+ use lsp::Url;
+ use once_cell::sync::Lazy;
+diff --git a/cli/lsp/language_server.rs b/cli/lsp/language_server.rs
+index 7c4191c..d8aa796 100644
+--- a/cli/lsp/language_server.rs
++++ b/cli/lsp/language_server.rs
+@@ -1,25 +1,25 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_ast::MediaType;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::resolve_url;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::task::spawn;
+-use deno_core::ModuleSpecifier;
+-use deno_lockfile::Lockfile;
+-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::deno_node::PackageJson;
+-use deno_runtime::deno_tls::rustls::RootCertStore;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
+-use deno_runtime::deno_web::BlobStore;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::resolve_url;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::task::spawn;
++use ::deno_core::ModuleSpecifier;
++use ::deno_lockfile::Lockfile;
++use ::deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::deno_node::PackageJson;
++use ::deno_runtime::deno_tls::rustls::RootCertStore;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_runtime::deno_web::BlobStore;
+ use import_map::ImportMap;
+ use log::error;
+ use serde_json::from_value;
+diff --git a/cli/lsp/lsp_custom.rs b/cli/lsp/lsp_custom.rs
+index 24c4bc1..076f249 100644
+--- a/cli/lsp/lsp_custom.rs
++++ b/cli/lsp/lsp_custom.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
+ use tower_lsp::lsp_types as lsp;
+ 
+ pub const CACHE_REQUEST: &str = "deno/cache";
+diff --git a/cli/lsp/mod.rs b/cli/lsp/mod.rs
+index d13c900..0eaf9f3 100644
+--- a/cli/lsp/mod.rs
++++ b/cli/lsp/mod.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::AnyError;
++use ::deno_core::error::AnyError;
+ use tower_lsp::LspService;
+ use tower_lsp::Server;
+ 
+diff --git a/cli/lsp/parent_process_checker.rs b/cli/lsp/parent_process_checker.rs
+index f83543c..44ef062 100644
+--- a/cli/lsp/parent_process_checker.rs
++++ b/cli/lsp/parent_process_checker.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::task::spawn;
++use ::deno_core::task::spawn;
+ use tokio::time::sleep;
+ use tokio::time::Duration;
+ 
+diff --git a/cli/lsp/path_to_regex.rs b/cli/lsp/path_to_regex.rs
+index 01dbc02..e81a8b6 100644
+--- a/cli/lsp/path_to_regex.rs
++++ b/cli/lsp/path_to_regex.rs
+@@ -26,8 +26,8 @@
+ // THE SOFTWARE.
+ //
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
+ use fancy_regex::Regex as FancyRegex;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+diff --git a/cli/lsp/performance.rs b/cli/lsp/performance.rs
+index 717ae79..d220c82 100644
+--- a/cli/lsp/performance.rs
++++ b/cli/lsp/performance.rs
+@@ -1,9 +1,9 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde_json::json;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde_json::json;
+ use std::cmp;
+ use std::collections::HashMap;
+ use std::collections::VecDeque;
+diff --git a/cli/lsp/refactor.rs b/cli/lsp/refactor.rs
+index c4be837..36ad4c5 100644
+--- a/cli/lsp/refactor.rs
++++ b/cli/lsp/refactor.rs
+@@ -3,9 +3,9 @@
+ // The logic of this module is heavily influenced by
+ // https://github.com/microsoft/vscode/blob/main/extensions/typescript-language-features/src/languageFeatures/refactor.ts
+ 
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::ModuleSpecifier;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::ModuleSpecifier;
+ use once_cell::sync::Lazy;
+ use tower_lsp::lsp_types as lsp;
+ 
+diff --git a/cli/lsp/registries.rs b/cli/lsp/registries.rs
+index b2f9bee..8186557 100644
+--- a/cli/lsp/registries.rs
++++ b/cli/lsp/registries.rs
+@@ -18,19 +18,19 @@ use crate::cache::HttpCache;
+ use crate::file_fetcher::FileFetcher;
+ use crate::http_util::HttpClient;
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::url::ParseError;
+-use deno_core::url::Position;
+-use deno_core::url::Url;
+-use deno_core::ModuleSpecifier;
+-use deno_graph::Dependency;
+-use deno_runtime::deno_web::BlobStore;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::url::ParseError;
++use ::deno_core::url::Position;
++use ::deno_core::url::Url;
++use ::deno_core::ModuleSpecifier;
++use ::deno_graph::Dependency;
++use ::deno_runtime::deno_web::BlobStore;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use log::error;
+ use once_cell::sync::Lazy;
+ use std::collections::HashMap;
+diff --git a/cli/lsp/repl.rs b/cli/lsp/repl.rs
+index ad01716..7e301c4 100644
+--- a/cli/lsp/repl.rs
++++ b/cli/lsp/repl.rs
+@@ -2,12 +2,12 @@
+ 
+ use std::collections::HashMap;
+ 
+-use deno_ast::LineAndColumnIndex;
+-use deno_ast::ModuleSpecifier;
+-use deno_ast::SourceTextInfo;
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
++use ::deno_ast::LineAndColumnIndex;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
+ use tower_lsp::lsp_types::ClientCapabilities;
+ use tower_lsp::lsp_types::ClientInfo;
+ use tower_lsp::lsp_types::CompletionContext;
+diff --git a/cli/lsp/testing/collectors.rs b/cli/lsp/testing/collectors.rs
+index 8361ee1..0c2cd30 100644
+--- a/cli/lsp/testing/collectors.rs
++++ b/cli/lsp/testing/collectors.rs
+@@ -2,13 +2,13 @@
+ 
+ use super::definitions::TestDefinition;
+ 
+-use deno_ast::swc::ast;
+-use deno_ast::swc::visit::Visit;
+-use deno_ast::swc::visit::VisitWith;
+-use deno_ast::SourceRange;
+-use deno_ast::SourceRangedForSpanned;
+-use deno_ast::SourceTextInfo;
+-use deno_core::ModuleSpecifier;
++use ::deno_ast::swc::ast;
++use ::deno_ast::swc::visit::Visit;
++use ::deno_ast::swc::visit::VisitWith;
++use ::deno_ast::SourceRange;
++use ::deno_ast::SourceRangedForSpanned;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::ModuleSpecifier;
+ use std::collections::HashMap;
+ use std::collections::HashSet;
+ 
+@@ -538,8 +538,8 @@ impl Visit for TestCollector {
+ #[cfg(test)]
+ pub mod tests {
+   use super::*;
+-  use deno_ast::StartSourcePos;
+-  use deno_core::resolve_url;
++  use ::deno_ast::StartSourcePos;
++  use ::deno_core::resolve_url;
+ 
+   pub fn new_range(start: usize, end: usize) -> SourceRange {
+     SourceRange::new(
+diff --git a/cli/lsp/testing/definitions.rs b/cli/lsp/testing/definitions.rs
+index 0e9eb9b..b64b782 100644
+--- a/cli/lsp/testing/definitions.rs
++++ b/cli/lsp/testing/definitions.rs
+@@ -6,9 +6,9 @@ use crate::lsp::analysis::source_range_to_lsp_range;
+ use crate::lsp::client::TestingNotification;
+ use crate::util::checksum;
+ 
+-use deno_ast::SourceRange;
+-use deno_ast::SourceTextInfo;
+-use deno_core::ModuleSpecifier;
++use ::deno_ast::SourceRange;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::ModuleSpecifier;
+ use std::collections::HashMap;
+ use tower_lsp::lsp_types as lsp;
+ 
+diff --git a/cli/lsp/testing/execution.rs b/cli/lsp/testing/execution.rs
+index ce8c8b5..e77fdf3 100644
+--- a/cli/lsp/testing/execution.rs
++++ b/cli/lsp/testing/execution.rs
+@@ -16,19 +16,19 @@ use crate::tools::test::FailFastTracker;
+ use crate::tools::test::TestEventSender;
+ use crate::util::checksum;
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::error::JsError;
+-use deno_core::futures::future;
+-use deno_core::futures::stream;
+-use deno_core::futures::StreamExt;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::parking_lot::RwLock;
+-use deno_core::task::spawn;
+-use deno_core::task::spawn_blocking;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::tokio_util::create_and_run_current_thread;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsError;
++use ::deno_core::futures::future;
++use ::deno_core::futures::stream;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::parking_lot::RwLock;
++use ::deno_core::task::spawn;
++use ::deno_core::task::spawn_blocking;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::tokio_util::create_and_run_current_thread;
+ use indexmap::IndexMap;
+ use std::collections::HashMap;
+ use std::collections::HashSet;
+@@ -811,7 +811,7 @@ impl LspTestReporter {
+ mod tests {
+   use super::*;
+   use crate::lsp::testing::collectors::tests::new_range;
+-  use deno_core::serde_json::json;
++  use ::deno_core::serde_json::json;
+ 
+   #[test]
+   fn test_as_queue_and_filters() {
+diff --git a/cli/lsp/testing/lsp_custom.rs b/cli/lsp/testing/lsp_custom.rs
+index a8dc62d..5de55fb 100644
+--- a/cli/lsp/testing/lsp_custom.rs
++++ b/cli/lsp/testing/lsp_custom.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
+ use tower_lsp::lsp_types as lsp;
+ 
+ pub const TEST_RUN_CANCEL_REQUEST: &str = "deno/testRunCancel";
+diff --git a/cli/lsp/testing/server.rs b/cli/lsp/testing/server.rs
+index 638ab5b..0ad02d6 100644
+--- a/cli/lsp/testing/server.rs
++++ b/cli/lsp/testing/server.rs
+@@ -12,13 +12,13 @@ use crate::lsp::documents::DocumentsFilter;
+ use crate::lsp::language_server::StateSnapshot;
+ use crate::lsp::performance::Performance;
+ 
+-use deno_ast::swc::visit::VisitWith;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::tokio_util::create_basic_runtime;
++use ::deno_ast::swc::visit::VisitWith;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::tokio_util::create_basic_runtime;
+ use std::collections::HashMap;
+ use std::collections::HashSet;
+ use std::sync::Arc;
+diff --git a/cli/lsp/text.rs b/cli/lsp/text.rs
+index 26df170..707f29d 100644
+--- a/cli/lsp/text.rs
++++ b/cli/lsp/text.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
+ use dissimilar::diff;
+ use dissimilar::Chunk;
+ use std::collections::HashMap;
+diff --git a/cli/lsp/tsc.rs b/cli/lsp/tsc.rs
+index bfbb5cf..52b356f 100644
+--- a/cli/lsp/tsc.rs
++++ b/cli/lsp/tsc.rs
+@@ -27,24 +27,24 @@ use crate::tsc::ResolveArgs;
+ use crate::util::path::relative_specifier;
+ use crate::util::path::specifier_to_file_path;
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::located_script_name;
+-use deno_core::op;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::resolve_url;
+-use deno_core::serde::de;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Serialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::JsRuntime;
+-use deno_core::ModuleSpecifier;
+-use deno_core::OpState;
+-use deno_core::RuntimeOptions;
+-use deno_runtime::tokio_util::create_basic_runtime;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::located_script_name;
++use ::deno_core::op;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::resolve_url;
++use ::deno_core::serde::de;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::JsRuntime;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::OpState;
++use ::deno_core::RuntimeOptions;
++use ::deno_runtime::tokio_util::create_basic_runtime;
+ use lazy_regex::lazy_regex;
+ use once_cell::sync::Lazy;
+ use regex::Captures;
+diff --git a/cli/lsp/urls.rs b/cli/lsp/urls.rs
+index dee89c9..1a78dee 100644
+--- a/cli/lsp/urls.rs
++++ b/cli/lsp/urls.rs
+@@ -3,13 +3,13 @@
+ use crate::file_fetcher::map_content_type;
+ 
+ use data_url::DataUrl;
+-use deno_ast::MediaType;
+-use deno_core::error::uri_error;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::url::Position;
+-use deno_core::url::Url;
+-use deno_core::ModuleSpecifier;
++use ::deno_ast::MediaType;
++use ::deno_core::error::uri_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::url::Position;
++use ::deno_core::url::Url;
++use ::deno_core::ModuleSpecifier;
+ use once_cell::sync::Lazy;
+ use std::collections::HashMap;
+ use std::sync::Arc;
+@@ -209,7 +209,7 @@ impl LspUrlMap {
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::resolve_url;
++  use ::deno_core::resolve_url;
+ 
+   #[test]
+   fn test_hash_data_specifier() {
+diff --git a/cli/main.rs b/cli/main.rs
+index 73820cb..ee19889 100644
+--- a/cli/main.rs
++++ b/cli/main.rs
+@@ -34,14 +34,14 @@ use crate::util::v8::get_v8_flags_from_env;
+ use crate::util::v8::init_v8_flags;
+ 
+ use args::CliOptions;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::error::JsError;
+-use deno_core::futures::FutureExt;
+-use deno_core::task::JoinHandle;
+-use deno_runtime::colors;
+-use deno_runtime::fmt_errors::format_js_error;
+-use deno_runtime::tokio_util::create_and_run_current_thread;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsError;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::task::JoinHandle;
++use ::deno_runtime::colors;
++use ::deno_runtime::fmt_errors::format_js_error;
++use ::deno_runtime::tokio_util::create_and_run_current_thread;
+ use factory::CliFactory;
+ use std::env;
+ use std::env::current_exe;
+diff --git a/cli/module_loader.rs b/cli/module_loader.rs
+index cc41697..319dd77 100644
+--- a/cli/module_loader.rs
++++ b/cli/module_loader.rs
+@@ -21,38 +21,38 @@ use crate::util::text_encoding::source_map_from_code;
+ use crate::watcher::FileWatcherReporter;
+ use crate::worker::ModuleLoaderFactory;
+ 
+-use deno_ast::MediaType;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::Context;
+-use deno_core::error::custom_error;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures::future::FutureExt;
+-use deno_core::futures::Future;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::resolve_url;
+-use deno_core::resolve_url_or_path;
+-use deno_core::ModuleCode;
+-use deno_core::ModuleLoader;
+-use deno_core::ModuleSource;
+-use deno_core::ModuleSpecifier;
+-use deno_core::ModuleType;
+-use deno_core::OpState;
+-use deno_core::ResolutionKind;
+-use deno_core::SourceMapGetter;
+-use deno_graph::source::Resolver;
+-use deno_graph::EsmModule;
+-use deno_graph::JsonModule;
+-use deno_graph::Module;
+-use deno_graph::Resolution;
+-use deno_lockfile::Lockfile;
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node::NodeResolution;
+-use deno_runtime::deno_node::NodeResolutionMode;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_semver::npm::NpmPackageNvReference;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::future::FutureExt;
++use ::deno_core::futures::Future;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::resolve_url;
++use ::deno_core::resolve_url_or_path;
++use ::deno_core::ModuleCode;
++use ::deno_core::ModuleLoader;
++use ::deno_core::ModuleSource;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::ModuleType;
++use ::deno_core::OpState;
++use ::deno_core::ResolutionKind;
++use ::deno_core::SourceMapGetter;
++use ::deno_graph::source::Resolver;
++use ::deno_graph::EsmModule;
++use ::deno_graph::JsonModule;
++use ::deno_graph::Module;
++use ::deno_graph::Resolution;
++use ::deno_lockfile::Lockfile;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node::NodeResolution;
++use ::deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_semver::npm::NpmPackageNvReference;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use std::borrow::Cow;
+ use std::cell::RefCell;
+ use std::collections::HashSet;
+diff --git a/cli/napi/async.rs b/cli/napi/async.rs
+index 48de367..aae8c21 100644
+--- a/cli/napi/async.rs
++++ b/cli/napi/async.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::deno_napi::*;
++use ::deno_runtime::deno_napi::*;
+ 
+ use crate::check_env;
+ 
+diff --git a/cli/napi/env.rs b/cli/napi/env.rs
+index decdd59..143ea89 100644
+--- a/cli/napi/env.rs
++++ b/cli/napi/env.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::deno_napi::*;
++use ::deno_runtime::deno_napi::*;
+ use std::os::raw::c_char;
+ 
+ /// # Safety
+diff --git a/cli/napi/js_native_api.rs b/cli/napi/js_native_api.rs
+index 900a50f..4d3e01b 100644
+--- a/cli/napi/js_native_api.rs
++++ b/cli/napi/js_native_api.rs
+@@ -2,15 +2,15 @@
+ 
+ #![allow(non_upper_case_globals)]
+ 
+-use deno_runtime::deno_napi::*;
++use ::deno_runtime::deno_napi::*;
+ use libc::INT_MAX;
+ use v8::BackingStore;
+ use v8::UniqueRef;
+ 
+ use super::util::get_array_buffer_ptr;
+-use deno_runtime::deno_napi::function::create_function;
+-use deno_runtime::deno_napi::function::create_function_template;
+-use deno_runtime::deno_napi::function::CallbackInfo;
++use ::deno_runtime::deno_napi::function::create_function;
++use ::deno_runtime::deno_napi::function::create_function_template;
++use ::deno_runtime::deno_napi::function::CallbackInfo;
+ use std::ptr::NonNull;
+ 
+ #[macro_export]
+diff --git a/cli/napi/threadsafe_functions.rs b/cli/napi/threadsafe_functions.rs
+index c477487..ca36ab6 100644
+--- a/cli/napi/threadsafe_functions.rs
++++ b/cli/napi/threadsafe_functions.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::futures::channel::mpsc;
+-use deno_runtime::deno_napi::*;
++use ::deno_core::futures::channel::mpsc;
++use ::deno_runtime::deno_napi::*;
+ use once_cell::sync::Lazy;
+ use std::mem::forget;
+ use std::sync::atomic::AtomicUsize;
+diff --git a/cli/napi/util.rs b/cli/napi/util.rs
+index 1f849c7..6701230 100644
+--- a/cli/napi/util.rs
++++ b/cli/napi/util.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::deno_napi::*;
++use ::deno_runtime::deno_napi::*;
+ use std::cell::Cell;
+ 
+ unsafe fn get_backing_store_slice(
+diff --git a/cli/node.rs b/cli/node.rs
+index 8b54d0d..086e020 100644
+--- a/cli/node.rs
++++ b/cli/node.rs
+@@ -2,18 +2,18 @@
+ 
+ use std::collections::HashSet;
+ 
+-use deno_ast::swc::common::SyntaxContext;
+-use deno_ast::view::Node;
+-use deno_ast::view::NodeTrait;
+-use deno_ast::CjsAnalysis;
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_ast::ParsedSource;
+-use deno_ast::SourceRanged;
+-use deno_core::error::AnyError;
+-use deno_runtime::deno_node::analyze::CjsAnalysis as ExtNodeCjsAnalysis;
+-use deno_runtime::deno_node::analyze::CjsEsmCodeAnalyzer;
+-use deno_runtime::deno_node::analyze::NodeCodeTranslator;
++use ::deno_ast::swc::common::SyntaxContext;
++use ::deno_ast::view::Node;
++use ::deno_ast::view::NodeTrait;
++use ::deno_ast::CjsAnalysis;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_ast::ParsedSource;
++use ::deno_ast::SourceRanged;
++use ::deno_core::error::AnyError;
++use ::deno_runtime::deno_node::analyze::CjsAnalysis as ExtNodeCjsAnalysis;
++use ::deno_runtime::deno_node::analyze::CjsEsmCodeAnalyzer;
++use ::deno_runtime::deno_node::analyze::NodeCodeTranslator;
+ 
+ use crate::cache::NodeAnalysisCache;
+ use crate::util::fs::canonicalize_path_maybe_not_exists;
+diff --git a/cli/npm/cache.rs b/cli/npm/cache.rs
+index aba6c0c..5bdd16b 100644
+--- a/cli/npm/cache.rs
++++ b/cli/npm/cache.rs
+@@ -6,17 +6,17 @@ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::url::Url;
+-use deno_npm::registry::NpmPackageVersionDistInfo;
+-use deno_npm::NpmPackageCacheFolderId;
+-use deno_semver::npm::NpmPackageNv;
+-use deno_semver::Version;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::url::Url;
++use ::deno_npm::registry::NpmPackageVersionDistInfo;
++use ::deno_npm::NpmPackageCacheFolderId;
++use ::deno_semver::npm::NpmPackageNv;
++use ::deno_semver::Version;
+ use once_cell::sync::Lazy;
+ 
+ use crate::args::CacheSetting;
+@@ -470,9 +470,9 @@ pub fn mixed_case_package_name_decode(name: &str) -> Option<String> {
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_core::url::Url;
+-  use deno_semver::npm::NpmPackageNv;
+-  use deno_semver::Version;
++  use ::deno_core::url::Url;
++  use ::deno_semver::npm::NpmPackageNv;
++  use ::deno_semver::Version;
+ 
+   use super::ReadonlyNpmCache;
+   use crate::npm::cache::NpmPackageCacheFolderId;
+diff --git a/cli/npm/installer.rs b/cli/npm/installer.rs
+index adb4344..763ec93 100644
+--- a/cli/npm/installer.rs
++++ b/cli/npm/installer.rs
+@@ -3,12 +3,12 @@
+ use std::future::Future;
+ use std::sync::Arc;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::futures::stream::FuturesOrdered;
+-use deno_core::futures::StreamExt;
+-use deno_npm::registry::NpmRegistryApi;
+-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
+-use deno_semver::npm::NpmPackageReq;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::stream::FuturesOrdered;
++use ::deno_core::futures::StreamExt;
++use ::deno_npm::registry::NpmRegistryApi;
++use ::deno_npm::registry::NpmRegistryPackageInfoLoadError;
++use ::deno_semver::npm::NpmPackageReq;
+ 
+ use crate::args::PackageJsonDepsProvider;
+ use crate::util::sync::AtomicFlag;
+diff --git a/cli/npm/registry.rs b/cli/npm/registry.rs
+index 40d7f62..191a84c 100644
+--- a/cli/npm/registry.rs
++++ b/cli/npm/registry.rs
+@@ -8,20 +8,20 @@ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+ use async_trait::async_trait;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::Context;
+-use deno_core::error::custom_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures::future::BoxFuture;
+-use deno_core::futures::future::Shared;
+-use deno_core::futures::FutureExt;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
+-use deno_core::TaskQueue;
+-use deno_npm::registry::NpmPackageInfo;
+-use deno_npm::registry::NpmRegistryApi;
+-use deno_npm::registry::NpmRegistryPackageInfoLoadError;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::custom_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::future::BoxFuture;
++use ::deno_core::futures::future::Shared;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
++use ::deno_core::TaskQueue;
++use ::deno_npm::registry::NpmPackageInfo;
++use ::deno_npm::registry::NpmRegistryApi;
++use ::deno_npm::registry::NpmRegistryPackageInfoLoadError;
+ use once_cell::sync::Lazy;
+ 
+ use crate::args::CacheSetting;
+diff --git a/cli/npm/resolution.rs b/cli/npm/resolution.rs
+index 66dfafb..b89c367 100644
+--- a/cli/npm/resolution.rs
++++ b/cli/npm/resolution.rs
+@@ -3,32 +3,32 @@
+ use std::collections::HashSet;
+ use std::sync::Arc;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::parking_lot::RwLock;
+-use deno_core::TaskQueue;
+-use deno_lockfile::NpmPackageDependencyLockfileInfo;
+-use deno_lockfile::NpmPackageLockfileInfo;
+-use deno_npm::registry::NpmPackageInfo;
+-use deno_npm::resolution::NpmPackageVersionResolutionError;
+-use deno_npm::resolution::NpmPackagesPartitioned;
+-use deno_npm::resolution::NpmResolutionError;
+-use deno_npm::resolution::NpmResolutionSnapshot;
+-use deno_npm::resolution::NpmResolutionSnapshotCreateOptions;
+-use deno_npm::resolution::PackageNotFoundFromReferrerError;
+-use deno_npm::resolution::PackageNvNotFoundError;
+-use deno_npm::resolution::PackageReqNotFoundError;
+-use deno_npm::resolution::SerializedNpmResolutionSnapshot;
+-use deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
+-use deno_npm::NpmPackageCacheFolderId;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmResolutionPackage;
+-use deno_npm::NpmSystemInfo;
+-use deno_semver::npm::NpmPackageNv;
+-use deno_semver::npm::NpmPackageNvReference;
+-use deno_semver::npm::NpmPackageReq;
+-use deno_semver::npm::NpmPackageReqReference;
+-use deno_semver::VersionReq;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::parking_lot::RwLock;
++use ::deno_core::TaskQueue;
++use ::deno_lockfile::NpmPackageDependencyLockfileInfo;
++use ::deno_lockfile::NpmPackageLockfileInfo;
++use ::deno_npm::registry::NpmPackageInfo;
++use ::deno_npm::resolution::NpmPackageVersionResolutionError;
++use ::deno_npm::resolution::NpmPackagesPartitioned;
++use ::deno_npm::resolution::NpmResolutionError;
++use ::deno_npm::resolution::NpmResolutionSnapshot;
++use ::deno_npm::resolution::NpmResolutionSnapshotCreateOptions;
++use ::deno_npm::resolution::PackageNotFoundFromReferrerError;
++use ::deno_npm::resolution::PackageNvNotFoundError;
++use ::deno_npm::resolution::PackageReqNotFoundError;
++use ::deno_npm::resolution::SerializedNpmResolutionSnapshot;
++use ::deno_npm::resolution::ValidSerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmPackageCacheFolderId;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmResolutionPackage;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_semver::npm::NpmPackageNv;
++use ::deno_semver::npm::NpmPackageNvReference;
++use ::deno_semver::npm::NpmPackageReq;
++use ::deno_semver::npm::NpmPackageReqReference;
++use ::deno_semver::VersionReq;
+ 
+ use crate::args::Lockfile;
+ 
+diff --git a/cli/npm/resolvers/common.rs b/cli/npm/resolvers/common.rs
+index b352229..65622c8 100644
+--- a/cli/npm/resolvers/common.rs
++++ b/cli/npm/resolvers/common.rs
+@@ -6,16 +6,16 @@ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+ use async_trait::async_trait;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_core::futures;
+-use deno_core::task::spawn;
+-use deno_core::url::Url;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmResolutionPackage;
+-use deno_runtime::deno_fs::FileSystem;
+-use deno_runtime::deno_node::NodePermissions;
+-use deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures;
++use ::deno_core::task::spawn;
++use ::deno_core::url::Url;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmResolutionPackage;
++use ::deno_runtime::deno_fs::FileSystem;
++use ::deno_runtime::deno_node::NodePermissions;
++use ::deno_runtime::deno_node::NodeResolutionMode;
+ 
+ use crate::npm::cache::should_sync_download;
+ use crate::npm::NpmCache;
+diff --git a/cli/npm/resolvers/global.rs b/cli/npm/resolvers/global.rs
+index 10a17f6..d327801 100644
+--- a/cli/npm/resolvers/global.rs
++++ b/cli/npm/resolvers/global.rs
+@@ -7,17 +7,17 @@ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+ use async_trait::async_trait;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_core::url::Url;
+-use deno_npm::resolution::PackageNotFoundFromReferrerError;
+-use deno_npm::NpmPackageCacheFolderId;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmResolutionPackage;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_fs::FileSystem;
+-use deno_runtime::deno_node::NodePermissions;
+-use deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_core::url::Url;
++use ::deno_npm::resolution::PackageNotFoundFromReferrerError;
++use ::deno_npm::NpmPackageCacheFolderId;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmResolutionPackage;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_fs::FileSystem;
++use ::deno_runtime::deno_node::NodePermissions;
++use ::deno_runtime::deno_node::NodeResolutionMode;
+ 
+ use crate::npm::resolution::NpmResolution;
+ use crate::npm::resolvers::common::cache_packages;
+diff --git a/cli/npm/resolvers/local.rs b/cli/npm/resolvers/local.rs
+index a708f86..003e2b3 100644
+--- a/cli/npm/resolvers/local.rs
++++ b/cli/npm/resolvers/local.rs
+@@ -16,23 +16,23 @@ use crate::util::fs::LaxSingleProcessFsFlag;
+ use crate::util::progress_bar::ProgressBar;
+ use crate::util::progress_bar::ProgressMessagePrompt;
+ use async_trait::async_trait;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::task::spawn;
+-use deno_core::task::JoinHandle;
+-use deno_core::url::Url;
+-use deno_npm::resolution::NpmResolutionSnapshot;
+-use deno_npm::NpmPackageCacheFolderId;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmResolutionPackage;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_core::futures;
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node::NodePermissions;
+-use deno_runtime::deno_node::NodeResolutionMode;
+-use deno_runtime::deno_node::PackageJson;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::task::spawn;
++use ::deno_core::task::JoinHandle;
++use ::deno_core::url::Url;
++use ::deno_npm::resolution::NpmResolutionSnapshot;
++use ::deno_npm::NpmPackageCacheFolderId;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmResolutionPackage;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_core::futures;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node::NodePermissions;
++use ::deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_runtime::deno_node::PackageJson;
+ 
+ use crate::npm::cache::mixed_case_package_name_encode;
+ use crate::npm::cache::should_sync_download;
+diff --git a/cli/npm/resolvers/mod.rs b/cli/npm/resolvers/mod.rs
+index 26d9548..c1ec299 100644
+--- a/cli/npm/resolvers/mod.rs
++++ b/cli/npm/resolvers/mod.rs
+@@ -8,26 +8,26 @@ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
+-use deno_npm::resolution::NpmResolutionSnapshot;
+-use deno_npm::resolution::PackageReqNotFoundError;
+-use deno_npm::resolution::SerializedNpmResolutionSnapshot;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_fs::FileSystem;
+-use deno_runtime::deno_node::NodePermissions;
+-use deno_runtime::deno_node::NodeResolutionMode;
+-use deno_runtime::deno_node::NpmResolver;
+-use deno_runtime::deno_node::PathClean;
+-use deno_semver::npm::NpmPackageNv;
+-use deno_semver::npm::NpmPackageNvReference;
+-use deno_semver::npm::NpmPackageReq;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
++use ::deno_npm::resolution::NpmResolutionSnapshot;
++use ::deno_npm::resolution::PackageReqNotFoundError;
++use ::deno_npm::resolution::SerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_fs::FileSystem;
++use ::deno_runtime::deno_node::NodePermissions;
++use ::deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_runtime::deno_node::NpmResolver;
++use ::deno_runtime::deno_node::PathClean;
++use ::deno_semver::npm::NpmPackageNv;
++use ::deno_semver::npm::NpmPackageNvReference;
++use ::deno_semver::npm::NpmPackageReq;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use global::GlobalNpmPackageResolver;
+ use serde::Deserialize;
+ use serde::Serialize;
+diff --git a/cli/npm/tarball.rs b/cli/npm/tarball.rs
+index ce1ac33..04a19de 100644
+--- a/cli/npm/tarball.rs
++++ b/cli/npm/tarball.rs
+@@ -5,10 +5,10 @@ use std::fs;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_npm::registry::NpmPackageVersionDistInfo;
+-use deno_semver::npm::NpmPackageNv;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_npm::registry::NpmPackageVersionDistInfo;
++use ::deno_semver::npm::NpmPackageNv;
+ use flate2::read::GzDecoder;
+ use tar::Archive;
+ use tar::EntryType;
+@@ -116,7 +116,7 @@ fn extract_tarball(data: &[u8], output_folder: &Path) -> Result<(), AnyError> {
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_semver::Version;
++  use ::deno_semver::Version;
+ 
+   use super::*;
+ 
+diff --git a/cli/ops/bench.rs b/cli/ops/bench.rs
+index da0f3d9..8396851 100644
+--- a/cli/ops/bench.rs
++++ b/cli/ops/bench.rs
+@@ -4,16 +4,16 @@ use std::sync::atomic::AtomicUsize;
+ use std::sync::atomic::Ordering;
+ use std::time;
+ 
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::op;
+-use deno_core::serde_v8;
+-use deno_core::v8;
+-use deno_core::ModuleSpecifier;
+-use deno_core::OpState;
+-use deno_runtime::permissions::create_child_permissions;
+-use deno_runtime::permissions::ChildPermissionsArg;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::op;
++use ::deno_core::serde_v8;
++use ::deno_core::v8;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::OpState;
++use ::deno_runtime::permissions::create_child_permissions;
++use ::deno_runtime::permissions::ChildPermissionsArg;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use serde::Deserialize;
+ use serde::Serialize;
+ use tokio::sync::mpsc::UnboundedSender;
+diff --git a/cli/ops/mod.rs b/cli/ops/mod.rs
+index d39f192..be21c33 100644
+--- a/cli/ops/mod.rs
++++ b/cli/ops/mod.rs
+@@ -3,10 +3,10 @@
+ use std::sync::Arc;
+ 
+ use crate::npm::CliNpmResolver;
+-use deno_core::error::AnyError;
+-use deno_core::op;
+-use deno_core::Extension;
+-use deno_core::OpState;
++use ::deno_core::error::AnyError;
++use ::deno_core::op;
++use ::deno_core::Extension;
++use ::deno_core::OpState;
+ 
+ pub mod bench;
+ pub mod testing;
+diff --git a/cli/ops/testing.rs b/cli/ops/testing.rs
+index 3f9ade7..90db0b5 100644
+--- a/cli/ops/testing.rs
++++ b/cli/ops/testing.rs
+@@ -6,16 +6,16 @@ use crate::tools::test::TestEventSender;
+ use crate::tools::test::TestLocation;
+ use crate::tools::test::TestStepDescription;
+ 
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::op;
+-use deno_core::serde_v8;
+-use deno_core::v8;
+-use deno_core::ModuleSpecifier;
+-use deno_core::OpState;
+-use deno_runtime::permissions::create_child_permissions;
+-use deno_runtime::permissions::ChildPermissionsArg;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::op;
++use ::deno_core::serde_v8;
++use ::deno_core::v8;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::OpState;
++use ::deno_runtime::permissions::create_child_permissions;
++use ::deno_runtime::permissions::ChildPermissionsArg;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use serde::Deserialize;
+ use serde::Deserializer;
+ use serde::Serialize;
+diff --git a/cli/resolver.rs b/cli/resolver.rs
+index 6fa8eaa..7ceccfe 100644
+--- a/cli/resolver.rs
++++ b/cli/resolver.rs
+@@ -1,20 +1,20 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::futures::future;
+-use deno_core::futures::future::LocalBoxFuture;
+-use deno_core::futures::FutureExt;
+-use deno_core::ModuleSpecifier;
+-use deno_core::TaskQueue;
+-use deno_graph::source::NpmPackageReqResolution;
+-use deno_graph::source::NpmResolver;
+-use deno_graph::source::Resolver;
+-use deno_graph::source::UnknownBuiltInNodeModuleError;
+-use deno_graph::source::DEFAULT_JSX_IMPORT_SOURCE_MODULE;
+-use deno_npm::registry::NpmRegistryApi;
+-use deno_runtime::deno_node::is_builtin_node_module;
+-use deno_semver::npm::NpmPackageReq;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::future;
++use ::deno_core::futures::future::LocalBoxFuture;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::TaskQueue;
++use ::deno_graph::source::NpmPackageReqResolution;
++use ::deno_graph::source::NpmResolver;
++use ::deno_graph::source::Resolver;
++use ::deno_graph::source::UnknownBuiltInNodeModuleError;
++use ::deno_graph::source::DEFAULT_JSX_IMPORT_SOURCE_MODULE;
++use ::deno_npm::registry::NpmRegistryApi;
++use ::deno_runtime::deno_node::is_builtin_node_module;
++use ::deno_semver::npm::NpmPackageReq;
+ use import_map::ImportMap;
+ use std::sync::Arc;
+ 
+diff --git a/cli/standalone/binary.rs b/cli/standalone/binary.rs
+index b5be2fe..ae400b8 100644
+--- a/cli/standalone/binary.rs
++++ b/cli/standalone/binary.rs
+@@ -9,20 +9,20 @@ use std::io::Write;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::futures::io::AllowStdIo;
+-use deno_core::futures::AsyncReadExt;
+-use deno_core::futures::AsyncSeekExt;
+-use deno_core::serde_json;
+-use deno_core::url::Url;
+-use deno_npm::registry::PackageDepNpmSchemeValueParseError;
+-use deno_npm::resolution::SerializedNpmResolutionSnapshot;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::permissions::PermissionsOptions;
+-use deno_semver::npm::NpmPackageReq;
+-use deno_semver::npm::NpmVersionReqSpecifierParseError;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::io::AllowStdIo;
++use ::deno_core::futures::AsyncReadExt;
++use ::deno_core::futures::AsyncSeekExt;
++use ::deno_core::serde_json;
++use ::deno_core::url::Url;
++use ::deno_npm::registry::PackageDepNpmSchemeValueParseError;
++use ::deno_npm::resolution::SerializedNpmResolutionSnapshot;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::permissions::PermissionsOptions;
++use ::deno_semver::npm::NpmPackageReq;
++use ::deno_semver::npm::NpmVersionReqSpecifierParseError;
+ use log::Level;
+ use serde::Deserialize;
+ use serde::Serialize;
+diff --git a/cli/standalone/file_system.rs b/cli/standalone/file_system.rs
+index f0891f7..8f6f305 100644
+--- a/cli/standalone/file_system.rs
++++ b/cli/standalone/file_system.rs
+@@ -5,15 +5,15 @@ use std::path::PathBuf;
+ use std::rc::Rc;
+ use std::sync::Arc;
+ 
+-use deno_runtime::deno_fs::FileSystem;
+-use deno_runtime::deno_fs::FsDirEntry;
+-use deno_runtime::deno_fs::FsFileType;
+-use deno_runtime::deno_fs::OpenOptions;
+-use deno_runtime::deno_fs::RealFs;
+-use deno_runtime::deno_io::fs::File;
+-use deno_runtime::deno_io::fs::FsError;
+-use deno_runtime::deno_io::fs::FsResult;
+-use deno_runtime::deno_io::fs::FsStat;
++use ::deno_runtime::deno_fs::FileSystem;
++use ::deno_runtime::deno_fs::FsDirEntry;
++use ::deno_runtime::deno_fs::FsFileType;
++use ::deno_runtime::deno_fs::OpenOptions;
++use ::deno_runtime::deno_fs::RealFs;
++use ::deno_runtime::deno_io::fs::File;
++use ::deno_runtime::deno_io::fs::FsError;
++use ::deno_runtime::deno_io::fs::FsResult;
++use ::deno_runtime::deno_io::fs::FsStat;
+ 
+ use super::virtual_fs::FileBackedVfs;
+ 
+diff --git a/cli/standalone/mod.rs b/cli/standalone/mod.rs
+index c7f595e..107fc11 100644
+--- a/cli/standalone/mod.rs
++++ b/cli/standalone/mod.rs
+@@ -27,26 +27,26 @@ use crate::worker::CliMainWorkerFactory;
+ use crate::worker::CliMainWorkerOptions;
+ use crate::worker::HasNodeSpecifierChecker;
+ use crate::worker::ModuleLoaderFactory;
+-use deno_ast::MediaType;
+-use deno_core::anyhow::Context;
+-use deno_core::error::type_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures::FutureExt;
+-use deno_core::v8_set_flags;
+-use deno_core::ModuleLoader;
+-use deno_core::ModuleSpecifier;
+-use deno_core::ModuleType;
+-use deno_core::ResolutionKind;
+-use deno_npm::NpmSystemInfo;
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node::analyze::NodeCodeTranslator;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::deno_tls::rustls::RootCertStore;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
+-use deno_runtime::deno_web::BlobStore;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::type_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::v8_set_flags;
++use ::deno_core::ModuleLoader;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::ModuleType;
++use ::deno_core::ResolutionKind;
++use ::deno_npm::NpmSystemInfo;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node::analyze::NodeCodeTranslator;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::deno_tls::rustls::RootCertStore;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_runtime::deno_web::BlobStore;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use import_map::parse_from_json;
+ use std::pin::Pin;
+ use std::rc::Rc;
+diff --git a/cli/standalone/virtual_fs.rs b/cli/standalone/virtual_fs.rs
+index 44d3a15..1411747 100644
+--- a/cli/standalone/virtual_fs.rs
++++ b/cli/standalone/virtual_fs.rs
+@@ -12,16 +12,16 @@ use std::path::PathBuf;
+ use std::rc::Rc;
+ use std::sync::Arc;
+ 
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::BufMutView;
+-use deno_core::BufView;
+-use deno_runtime::deno_fs::FsDirEntry;
+-use deno_runtime::deno_io;
+-use deno_runtime::deno_io::fs::FsError;
+-use deno_runtime::deno_io::fs::FsResult;
+-use deno_runtime::deno_io::fs::FsStat;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::BufMutView;
++use ::deno_core::BufView;
++use ::deno_runtime::deno_fs::FsDirEntry;
++use ::deno_runtime::deno_io;
++use ::deno_runtime::deno_io::fs::FsError;
++use ::deno_runtime::deno_io::fs::FsResult;
++use ::deno_runtime::deno_io::fs::FsStat;
+ use serde::Deserialize;
+ use serde::Serialize;
+ use thiserror::Error;
+diff --git a/cli/tests/integration/bench_tests.rs b/cli/tests/integration/bench_tests.rs
+index 5b7361b..a5a69f7 100644
+--- a/cli/tests/integration/bench_tests.rs
++++ b/cli/tests/integration/bench_tests.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::url::Url;
++use ::deno_core::url::Url;
+ use test_util as util;
+ use util::assert_contains;
+ use util::env_vars_for_npm_tests;
+diff --git a/cli/tests/integration/cert_tests.rs b/cli/tests/integration/cert_tests.rs
+index b04f2d3..4ad7b33 100644
+--- a/cli/tests/integration/cert_tests.rs
++++ b/cli/tests/integration/cert_tests.rs
+@@ -1,8 +1,8 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::deno_net::ops_tls::TlsStream;
+-use deno_runtime::deno_tls::rustls;
+-use deno_runtime::deno_tls::rustls_pemfile;
++use ::deno_runtime::deno_net::ops_tls::TlsStream;
++use ::deno_runtime::deno_tls::rustls;
++use ::deno_runtime::deno_tls::rustls_pemfile;
+ use lsp_types::Url;
+ use std::io::BufReader;
+ use std::io::Cursor;
+diff --git a/cli/tests/integration/inspector_tests.rs b/cli/tests/integration/inspector_tests.rs
+index f94dd22..65cfd75 100644
+--- a/cli/tests/integration/inspector_tests.rs
++++ b/cli/tests/integration/inspector_tests.rs
+@@ -1,11 +1,11 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::url;
+-use deno_runtime::deno_fetch::reqwest;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::url;
++use ::deno_runtime::deno_fetch::reqwest;
+ use fastwebsockets::FragmentCollector;
+ use fastwebsockets::Frame;
+ use fastwebsockets::WebSocket;
+diff --git a/cli/tests/integration/lsp_tests.rs b/cli/tests/integration/lsp_tests.rs
+index eee83c4..03e3bf9 100644
+--- a/cli/tests/integration/lsp_tests.rs
++++ b/cli/tests/integration/lsp_tests.rs
+@@ -1,11 +1,11 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::url::Url;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::url::Url;
+ use pretty_assertions::assert_eq;
+ use std::fs;
+ use std::process::Stdio;
+diff --git a/cli/tests/integration/npm_tests.rs b/cli/tests/integration/npm_tests.rs
+index 3a18c13..d7bbc8f 100644
+--- a/cli/tests/integration/npm_tests.rs
++++ b/cli/tests/integration/npm_tests.rs
+@@ -1,8 +1,8 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
+ use pretty_assertions::assert_eq;
+ use std::process::Stdio;
+ use test_util as util;
+diff --git a/cli/tests/integration/run_tests.rs b/cli/tests/integration/run_tests.rs
+index 31b541e..048aea7 100644
+--- a/cli/tests/integration/run_tests.rs
++++ b/cli/tests/integration/run_tests.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::url;
+-use deno_runtime::deno_fetch::reqwest;
++use ::deno_core::url;
++use ::deno_runtime::deno_fetch::reqwest;
+ use std::io::Read;
+ use std::io::Write;
+ use std::process::Command;
+diff --git a/cli/tests/integration/test_tests.rs b/cli/tests/integration/test_tests.rs
+index 4dd2952..797f301 100644
+--- a/cli/tests/integration/test_tests.rs
++++ b/cli/tests/integration/test_tests.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::url::Url;
++use ::deno_core::url::Url;
+ use test_util as util;
+ use util::assert_contains;
+ use util::env_vars_for_npm_tests;
+diff --git a/cli/tests/integration/vendor_tests.rs b/cli/tests/integration/vendor_tests.rs
+index 94ab2ad..2687125 100644
+--- a/cli/tests/integration/vendor_tests.rs
++++ b/cli/tests/integration/vendor_tests.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
+ use pretty_assertions::assert_eq;
+ use std::fmt::Write as _;
+ use std::path::PathBuf;
+diff --git a/cli/tools/bench.rs b/cli/tools/bench.rs
+index 107fd2b..9d8b9b3 100644
+--- a/cli/tools/bench.rs
++++ b/cli/tools/bench.rs
+@@ -18,22 +18,22 @@ use crate::util::path::is_supported_ext;
+ use crate::version::get_user_agent;
+ use crate::worker::CliMainWorkerFactory;
+ 
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::error::JsError;
+-use deno_core::futures::future;
+-use deno_core::futures::stream;
+-use deno_core::futures::FutureExt;
+-use deno_core::futures::StreamExt;
+-use deno_core::located_script_name;
+-use deno_core::serde_v8;
+-use deno_core::task::spawn;
+-use deno_core::task::spawn_blocking;
+-use deno_core::v8;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_runtime::tokio_util::create_and_run_current_thread;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsError;
++use ::deno_core::futures::future;
++use ::deno_core::futures::stream;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::located_script_name;
++use ::deno_core::serde_v8;
++use ::deno_core::task::spawn;
++use ::deno_core::task::spawn_blocking;
++use ::deno_core::v8;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_runtime::tokio_util::create_and_run_current_thread;
+ use indexmap::IndexMap;
+ use indexmap::IndexSet;
+ use log::Level;
+diff --git a/cli/tools/bundle.rs b/cli/tools/bundle.rs
+index 759882c..1690801 100644
+--- a/cli/tools/bundle.rs
++++ b/cli/tools/bundle.rs
+@@ -3,10 +3,10 @@
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::futures::FutureExt;
+-use deno_graph::Module;
+-use deno_runtime::colors;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::FutureExt;
++use ::deno_graph::Module;
++use ::deno_runtime::colors;
+ 
+ use crate::args::BundleFlags;
+ use crate::args::CliOptions;
+diff --git a/cli/tools/check.rs b/cli/tools/check.rs
+index 4464802..ebbc907 100644
+--- a/cli/tools/check.rs
++++ b/cli/tools/check.rs
+@@ -3,13 +3,13 @@
+ use std::collections::HashSet;
+ use std::sync::Arc;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
+-use deno_runtime::colors;
+-use deno_runtime::deno_node::NodeResolver;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
++use ::deno_runtime::colors;
++use ::deno_runtime::deno_node::NodeResolver;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+ 
+@@ -442,7 +442,7 @@ fn get_leading_comments(file_text: &str) -> Vec<String> {
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_ast::MediaType;
++  use ::deno_ast::MediaType;
+ 
+   use super::get_leading_comments;
+   use super::has_ts_check;
+diff --git a/cli/tools/compile.rs b/cli/tools/compile.rs
+index 2ce03e3..ee7225e 100644
+--- a/cli/tools/compile.rs
++++ b/cli/tools/compile.rs
+@@ -5,12 +5,12 @@ use crate::args::Flags;
+ use crate::factory::CliFactory;
+ use crate::standalone::is_standalone_binary;
+ use crate::util::path::path_has_trailing_slash;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url_or_path;
+-use deno_runtime::colors;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url_or_path;
++use ::deno_runtime::colors;
+ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+diff --git a/cli/tools/coverage/mod.rs b/cli/tools/coverage/mod.rs
+index 223bac3..b855def 100644
+--- a/cli/tools/coverage/mod.rs
++++ b/cli/tools/coverage/mod.rs
+@@ -10,17 +10,17 @@ use crate::tools::test::is_supported_test_path;
+ use crate::util::fs::FileCollector;
+ use crate::util::text_encoding::source_map_from_code;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::Context;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::sourcemap::SourceMap;
+-use deno_core::url::Url;
+-use deno_core::LocalInspectorSession;
+-use deno_core::ModuleCode;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::sourcemap::SourceMap;
++use ::deno_core::url::Url;
++use ::deno_core::LocalInspectorSession;
++use ::deno_core::ModuleCode;
+ use regex::Regex;
+ use std::fs;
+ use std::fs::File;
+diff --git a/cli/tools/doc.rs b/cli/tools/doc.rs
+index 2cb53cb..cbef2eb 100644
+--- a/cli/tools/doc.rs
++++ b/cli/tools/doc.rs
+@@ -10,13 +10,13 @@ use crate::factory::CliFactory;
+ use crate::file_fetcher::File;
+ use crate::graph_util::graph_lock_or_exit;
+ use crate::tsc::get_types_declaration_file_text;
+-use deno_ast::MediaType;
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_path;
+-use deno_core::resolve_url_or_path;
+-use deno_doc as doc;
+-use deno_graph::ModuleSpecifier;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_path;
++use ::deno_core::resolve_url_or_path;
++use ::deno_doc as doc;
++use ::deno_graph::ModuleSpecifier;
+ use std::path::PathBuf;
+ 
+ pub async fn print_docs(
+diff --git a/cli/tools/fmt.rs b/cli/tools/fmt.rs
+index f2fec93..85af169 100644
+--- a/cli/tools/fmt.rs
++++ b/cli/tools/fmt.rs
+@@ -20,15 +20,15 @@ use crate::util::file_watcher::ResolutionResult;
+ use crate::util::fs::FileCollector;
+ use crate::util::path::get_extension;
+ use crate::util::text_encoding;
+-use deno_ast::ParsedSource;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::futures;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::task::spawn_blocking;
++use ::deno_ast::ParsedSource;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::task::spawn_blocking;
+ use log::debug;
+ use log::info;
+ use log::warn;
+diff --git a/cli/tools/info.rs b/cli/tools/info.rs
+index 63a7553..e2a0e55 100644
+--- a/cli/tools/info.rs
++++ b/cli/tools/info.rs
+@@ -5,24 +5,24 @@ use std::collections::HashSet;
+ use std::fmt;
+ use std::fmt::Write;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url_or_path;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_graph::Dependency;
+-use deno_graph::Module;
+-use deno_graph::ModuleError;
+-use deno_graph::ModuleGraph;
+-use deno_graph::ModuleGraphError;
+-use deno_graph::Resolution;
+-use deno_npm::resolution::NpmResolutionSnapshot;
+-use deno_npm::NpmPackageId;
+-use deno_npm::NpmResolutionPackage;
+-use deno_runtime::colors;
+-use deno_semver::npm::NpmPackageNv;
+-use deno_semver::npm::NpmPackageNvReference;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url_or_path;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_graph::Dependency;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleError;
++use ::deno_graph::ModuleGraph;
++use ::deno_graph::ModuleGraphError;
++use ::deno_graph::Resolution;
++use ::deno_npm::resolution::NpmResolutionSnapshot;
++use ::deno_npm::NpmPackageId;
++use ::deno_npm::NpmResolutionPackage;
++use ::deno_runtime::colors;
++use ::deno_semver::npm::NpmPackageNv;
++use ::deno_semver::npm::NpmPackageNvReference;
++use ::deno_semver::npm::NpmPackageReqReference;
+ 
+ use crate::args::Flags;
+ use crate::args::InfoFlags;
+diff --git a/cli/tools/init/mod.rs b/cli/tools/init/mod.rs
+index 7d1d123..7031e83 100644
+--- a/cli/tools/init/mod.rs
++++ b/cli/tools/init/mod.rs
+@@ -3,8 +3,8 @@
+ use crate::args::InitFlags;
+ use crate::colors;
+ use crate::deno_std;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
+ use log::info;
+ use std::io::Write;
+ use std::path::Path;
+diff --git a/cli/tools/installer.rs b/cli/tools/installer.rs
+index 07606d5..f043dbe 100644
+--- a/cli/tools/installer.rs
++++ b/cli/tools/installer.rs
+@@ -10,12 +10,12 @@ use crate::factory::CliFactory;
+ use crate::http_util::HttpClient;
+ use crate::util::fs::canonicalize_path_maybe_not_exists;
+ 
+-use deno_core::anyhow::Context;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url_or_path;
+-use deno_core::url::Url;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url_or_path;
++use ::deno_core::url::Url;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use log::Level;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+diff --git a/cli/tools/lint.rs b/cli/tools/lint.rs
+index 40c37ce..d5a9b29 100644
+--- a/cli/tools/lint.rs
++++ b/cli/tools/lint.rs
+@@ -18,18 +18,18 @@ use crate::util::file_watcher;
+ use crate::util::file_watcher::ResolutionResult;
+ use crate::util::fs::FileCollector;
+ use crate::util::path::is_supported_ext;
+-use deno_ast::MediaType;
+-use deno_core::anyhow::bail;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::error::JsStackFrame;
+-use deno_core::serde_json;
+-use deno_lint::diagnostic::LintDiagnostic;
+-use deno_lint::linter::Linter;
+-use deno_lint::linter::LinterBuilder;
+-use deno_lint::rules;
+-use deno_lint::rules::LintRule;
+-use deno_runtime::fmt_errors::format_location;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsStackFrame;
++use ::deno_core::serde_json;
++use ::deno_lint::diagnostic::LintDiagnostic;
++use ::deno_lint::linter::Linter;
++use ::deno_lint::linter::LinterBuilder;
++use ::deno_lint::rules;
++use ::deno_lint::rules::LintRule;
++use ::deno_runtime::fmt_errors::format_location;
+ use log::debug;
+ use log::info;
+ use serde::Serialize;
+@@ -551,7 +551,7 @@ pub fn get_configured_rules(
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_lint::rules::get_recommended_rules;
++  use ::deno_lint::rules::get_recommended_rules;
+ 
+   use super::*;
+   use crate::args::LintRulesConfig;
+diff --git a/cli/tools/repl/cdp.rs b/cli/tools/repl/cdp.rs
+index f90a187..bff53dc 100644
+--- a/cli/tools/repl/cdp.rs
++++ b/cli/tools/repl/cdp.rs
+@@ -1,8 +1,8 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+ /// <https://chromedevtools.github.io/devtools-protocol/tot/>
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
+ use serde::Deserialize;
+ use serde::Deserializer;
+ use serde::Serialize;
+diff --git a/cli/tools/repl/channel.rs b/cli/tools/repl/channel.rs
+index 47007e6..9520199 100644
+--- a/cli/tools/repl/channel.rs
++++ b/cli/tools/repl/channel.rs
+@@ -1,9 +1,9 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
+ use std::cell::RefCell;
+ use tokio::sync::mpsc::channel;
+ use tokio::sync::mpsc::unbounded_channel;
+diff --git a/cli/tools/repl/editor.rs b/cli/tools/repl/editor.rs
+index 79467a9..7de1d91 100644
+--- a/cli/tools/repl/editor.rs
++++ b/cli/tools/repl/editor.rs
+@@ -1,15 +1,15 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+ use crate::colors;
+-use deno_ast::swc::parser::error::SyntaxError;
+-use deno_ast::swc::parser::token::BinOpToken;
+-use deno_ast::swc::parser::token::Token;
+-use deno_ast::swc::parser::token::Word;
+-use deno_ast::view::AssignOp;
+-use deno_core::anyhow::Context as _;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_json;
++use ::deno_ast::swc::parser::error::SyntaxError;
++use ::deno_ast::swc::parser::token::BinOpToken;
++use ::deno_ast::swc::parser::token::Token;
++use ::deno_ast::swc::parser::token::Word;
++use ::deno_ast::view::AssignOp;
++use ::deno_core::anyhow::Context as _;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_json;
+ use rustyline::completion::Completer;
+ use rustyline::error::ReadlineError;
+ use rustyline::highlight::Highlighter;
+diff --git a/cli/tools/repl/mod.rs b/cli/tools/repl/mod.rs
+index 34acb8a..1ed03b1 100644
+--- a/cli/tools/repl/mod.rs
++++ b/cli/tools/repl/mod.rs
+@@ -6,11 +6,11 @@ use crate::args::ReplFlags;
+ use crate::colors;
+ use crate::factory::CliFactory;
+ use crate::file_fetcher::FileFetcher;
+-use deno_core::error::AnyError;
+-use deno_core::futures::StreamExt;
+-use deno_core::task::spawn_blocking;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::task::spawn_blocking;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::permissions::PermissionsContainer;
+ use rustyline::error::ReadlineError;
+ 
+ mod cdp;
+diff --git a/cli/tools/repl/session.rs b/cli/tools/repl/session.rs
+index 40cf7d3..849ad1a 100644
+--- a/cli/tools/repl/session.rs
++++ b/cli/tools/repl/session.rs
+@@ -10,24 +10,24 @@ use crate::lsp::ReplLanguageServer;
+ use crate::npm::CliNpmResolver;
+ use crate::resolver::CliGraphResolver;
+ 
+-use deno_ast::swc::ast as swc_ast;
+-use deno_ast::swc::visit::noop_visit_type;
+-use deno_ast::swc::visit::Visit;
+-use deno_ast::swc::visit::VisitWith;
+-use deno_ast::DiagnosticsError;
+-use deno_ast::ImportsNotUsedAsValues;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_core::futures::channel::mpsc::UnboundedReceiver;
+-use deno_core::futures::FutureExt;
+-use deno_core::futures::StreamExt;
+-use deno_core::serde_json;
+-use deno_core::serde_json::Value;
+-use deno_core::LocalInspectorSession;
+-use deno_graph::source::Resolver;
+-use deno_runtime::deno_node;
+-use deno_runtime::worker::MainWorker;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::swc::ast as swc_ast;
++use ::deno_ast::swc::visit::noop_visit_type;
++use ::deno_ast::swc::visit::Visit;
++use ::deno_ast::swc::visit::VisitWith;
++use ::deno_ast::DiagnosticsError;
++use ::deno_ast::ImportsNotUsedAsValues;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::channel::mpsc::UnboundedReceiver;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::LocalInspectorSession;
++use ::deno_graph::source::Resolver;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::worker::MainWorker;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use once_cell::sync::Lazy;
+ 
+ use super::cdp;
+@@ -590,7 +590,7 @@ impl Visit for ImportCollector {
+   }
+ 
+   fn visit_module_decl(&mut self, module_decl: &swc_ast::ModuleDecl) {
+-    use deno_ast::swc::ast::*;
++    use ::deno_ast::swc::ast::*;
+ 
+     match module_decl {
+       ModuleDecl::Import(import_decl) => {
+diff --git a/cli/tools/run.rs b/cli/tools/run.rs
+index 4805ea7..14df61f 100644
+--- a/cli/tools/run.rs
++++ b/cli/tools/run.rs
+@@ -2,11 +2,11 @@
+ 
+ use std::io::Read;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::permissions::PermissionsContainer;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::permissions::PermissionsContainer;
+ 
+ use crate::args::EvalFlags;
+ use crate::args::Flags;
+diff --git a/cli/tools/task.rs b/cli/tools/task.rs
+index 7dd7e7b..7615bda 100644
+--- a/cli/tools/task.rs
++++ b/cli/tools/task.rs
+@@ -7,16 +7,16 @@ use crate::colors;
+ use crate::factory::CliFactory;
+ use crate::npm::CliNpmResolver;
+ use crate::util::fs::canonicalize_path;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::futures;
+-use deno_core::futures::future::LocalBoxFuture;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_semver::npm::NpmPackageNv;
+-use deno_task_shell::ExecuteResult;
+-use deno_task_shell::ShellCommand;
+-use deno_task_shell::ShellCommandContext;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures;
++use ::deno_core::futures::future::LocalBoxFuture;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_semver::npm::NpmPackageNv;
++use ::deno_task_shell::ExecuteResult;
++use ::deno_task_shell::ShellCommand;
++use ::deno_task_shell::ShellCommandContext;
+ use indexmap::IndexMap;
+ use std::collections::HashMap;
+ use std::path::PathBuf;
+diff --git a/cli/tools/test.rs b/cli/tools/test.rs
+index f78e325..bb2a97a 100644
+--- a/cli/tools/test.rs
++++ b/cli/tools/test.rs
+@@ -21,30 +21,30 @@ use crate::util::path::is_supported_ext;
+ use crate::util::path::mapped_specifier_for_tsc;
+ use crate::worker::CliMainWorkerFactory;
+ 
+-use deno_ast::swc::common::comments::CommentKind;
+-use deno_ast::MediaType;
+-use deno_ast::SourceRangedForSpanned;
+-use deno_core::error::generic_error;
+-use deno_core::error::AnyError;
+-use deno_core::error::JsError;
+-use deno_core::futures::future;
+-use deno_core::futures::stream;
+-use deno_core::futures::FutureExt;
+-use deno_core::futures::StreamExt;
+-use deno_core::located_script_name;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::serde_v8;
+-use deno_core::task::spawn;
+-use deno_core::task::spawn_blocking;
+-use deno_core::url::Url;
+-use deno_core::v8;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::deno_io::Stdio;
+-use deno_runtime::deno_io::StdioPipe;
+-use deno_runtime::fmt_errors::format_js_error;
+-use deno_runtime::permissions::Permissions;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_runtime::tokio_util::create_and_run_current_thread;
++use ::deno_ast::swc::common::comments::CommentKind;
++use ::deno_ast::MediaType;
++use ::deno_ast::SourceRangedForSpanned;
++use ::deno_core::error::generic_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsError;
++use ::deno_core::futures::future;
++use ::deno_core::futures::stream;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::futures::StreamExt;
++use ::deno_core::located_script_name;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::serde_v8;
++use ::deno_core::task::spawn;
++use ::deno_core::task::spawn_blocking;
++use ::deno_core::url::Url;
++use ::deno_core::v8;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::deno_io::Stdio;
++use ::deno_runtime::deno_io::StdioPipe;
++use ::deno_runtime::fmt_errors::format_js_error;
++use ::deno_runtime::permissions::Permissions;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_runtime::tokio_util::create_and_run_current_thread;
+ use indexmap::IndexMap;
+ use indexmap::IndexSet;
+ use log::Level;
+diff --git a/cli/tools/upgrade.rs b/cli/tools/upgrade.rs
+index a6bc297..aba9096 100644
+--- a/cli/tools/upgrade.rs
++++ b/cli/tools/upgrade.rs
+@@ -12,13 +12,13 @@ use crate::util::progress_bar::ProgressBarStyle;
+ use crate::util::time;
+ use crate::version;
+ 
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::futures::future::BoxFuture;
+-use deno_core::futures::FutureExt;
+-use deno_core::task::spawn;
+-use deno_semver::Version;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::future::BoxFuture;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::task::spawn;
++use ::deno_semver::Version;
+ use once_cell::sync::Lazy;
+ use std::borrow::Cow;
+ use std::env;
+@@ -643,7 +643,7 @@ impl CheckVersionFile {
+ mod test {
+   use std::sync::Arc;
+ 
+-  use deno_core::parking_lot::Mutex;
++  use ::deno_core::parking_lot::Mutex;
+ 
+   use super::*;
+ 
+diff --git a/cli/tools/vendor/analyze.rs b/cli/tools/vendor/analyze.rs
+index 3b1f20a..b8711d3 100644
+--- a/cli/tools/vendor/analyze.rs
++++ b/cli/tools/vendor/analyze.rs
+@@ -1,14 +1,14 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_ast::swc::ast::ExportDefaultDecl;
+-use deno_ast::swc::ast::ExportSpecifier;
+-use deno_ast::swc::ast::ModuleExportName;
+-use deno_ast::swc::ast::NamedExport;
+-use deno_ast::swc::ast::Program;
+-use deno_ast::swc::visit::noop_visit_type;
+-use deno_ast::swc::visit::Visit;
+-use deno_ast::swc::visit::VisitWith;
+-use deno_ast::ParsedSource;
++use ::deno_ast::swc::ast::ExportDefaultDecl;
++use ::deno_ast::swc::ast::ExportSpecifier;
++use ::deno_ast::swc::ast::ModuleExportName;
++use ::deno_ast::swc::ast::NamedExport;
++use ::deno_ast::swc::ast::Program;
++use ::deno_ast::swc::visit::noop_visit_type;
++use ::deno_ast::swc::visit::Visit;
++use ::deno_ast::swc::visit::VisitWith;
++use ::deno_ast::ParsedSource;
+ 
+ /// Gets if the parsed source has a default export.
+ pub fn has_default_export(source: &ParsedSource) -> bool {
+@@ -60,10 +60,10 @@ fn export_specifier_has_default(s: &ExportSpecifier) -> bool {
+ 
+ #[cfg(test)]
+ mod test {
+-  use deno_ast::MediaType;
+-  use deno_ast::ParseParams;
+-  use deno_ast::ParsedSource;
+-  use deno_ast::SourceTextInfo;
++  use ::deno_ast::MediaType;
++  use ::deno_ast::ParseParams;
++  use ::deno_ast::ParsedSource;
++  use ::deno_ast::SourceTextInfo;
+ 
+   use super::has_default_export;
+ 
+diff --git a/cli/tools/vendor/build.rs b/cli/tools/vendor/build.rs
+index 11a1fb5..27fb34e 100644
+--- a/cli/tools/vendor/build.rs
++++ b/cli/tools/vendor/build.rs
+@@ -5,14 +5,14 @@ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::parking_lot::Mutex;
+-use deno_graph::EsmModule;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_graph::EsmModule;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
+ use import_map::ImportMap;
+ use import_map::SpecifierMap;
+ 
+@@ -219,7 +219,7 @@ fn build_proxy_module_source(
+ #[cfg(test)]
+ mod test {
+   use crate::tools::vendor::test::VendorTestBuilder;
+-  use deno_core::serde_json::json;
++  use ::deno_core::serde_json::json;
+   use pretty_assertions::assert_eq;
+ 
+   #[tokio::test]
+diff --git a/cli/tools/vendor/import_map.rs b/cli/tools/vendor/import_map.rs
+index dbda81a..3e50f9b 100644
+--- a/cli/tools/vendor/import_map.rs
++++ b/cli/tools/vendor/import_map.rs
+@@ -1,14 +1,14 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_ast::LineAndColumnIndex;
+-use deno_ast::ModuleSpecifier;
+-use deno_ast::SourceTextInfo;
+-use deno_core::error::AnyError;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
+-use deno_graph::Position;
+-use deno_graph::Range;
+-use deno_graph::Resolution;
++use ::deno_ast::LineAndColumnIndex;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_ast::SourceTextInfo;
++use ::deno_core::error::AnyError;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
++use ::deno_graph::Position;
++use ::deno_graph::Range;
++use ::deno_graph::Resolution;
+ use import_map::ImportMap;
+ use import_map::SpecifierMap;
+ use indexmap::IndexMap;
+diff --git a/cli/tools/vendor/mappings.rs b/cli/tools/vendor/mappings.rs
+index 3addd86..6b29ace 100644
+--- a/cli/tools/vendor/mappings.rs
++++ b/cli/tools/vendor/mappings.rs
+@@ -5,12 +5,12 @@ use std::collections::HashSet;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::AnyError;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
+-use deno_graph::Position;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::AnyError;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
++use ::deno_graph::Position;
+ 
+ use crate::util::path::path_with_stem_suffix;
+ use crate::util::path::relative_specifier;
+diff --git a/cli/tools/vendor/mod.rs b/cli/tools/vendor/mod.rs
+index 5690f5b..2be47b1 100644
+--- a/cli/tools/vendor/mod.rs
++++ b/cli/tools/vendor/mod.rs
+@@ -4,12 +4,12 @@ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_ast::TextChange;
+-use deno_core::anyhow::bail;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::resolve_url_or_path;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_ast::TextChange;
++use ::deno_core::anyhow::bail;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::resolve_url_or_path;
+ use log::warn;
+ 
+ use crate::args::CliOptions;
+diff --git a/cli/tools/vendor/specifiers.rs b/cli/tools/vendor/specifiers.rs
+index bb7e031..9f1ffa8 100644
+--- a/cli/tools/vendor/specifiers.rs
++++ b/cli/tools/vendor/specifiers.rs
+@@ -4,9 +4,9 @@ use std::collections::BTreeMap;
+ use std::collections::HashSet;
+ use std::path::PathBuf;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::anyhow;
+-use deno_core::error::AnyError;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::error::AnyError;
+ 
+ use crate::util::path::is_banned_path_char;
+ use crate::util::path::path_with_stem_suffix;
+diff --git a/cli/tools/vendor/test.rs b/cli/tools/vendor/test.rs
+index e8a474e..582b139 100644
+--- a/cli/tools/vendor/test.rs
++++ b/cli/tools/vendor/test.rs
+@@ -7,16 +7,16 @@ use std::path::Path;
+ use std::path::PathBuf;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::bail;
+-use deno_core::error::AnyError;
+-use deno_core::futures;
+-use deno_core::serde_json;
+-use deno_graph::source::LoadFuture;
+-use deno_graph::source::LoadResponse;
+-use deno_graph::source::Loader;
+-use deno_graph::ModuleGraph;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::bail;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures;
++use ::deno_core::serde_json;
++use ::deno_graph::source::LoadFuture;
++use ::deno_graph::source::LoadResponse;
++use ::deno_graph::source::Loader;
++use ::deno_graph::ModuleGraph;
+ use import_map::ImportMap;
+ 
+ use crate::cache::ParsedSourceCache;
+diff --git a/cli/tsc/diagnostics.rs b/cli/tsc/diagnostics.rs
+index 15aadff..49cd6ce 100644
+--- a/cli/tsc/diagnostics.rs
++++ b/cli/tsc/diagnostics.rs
+@@ -1,11 +1,11 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::colors;
++use ::deno_runtime::colors;
+ 
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Deserializer;
+-use deno_core::serde::Serialize;
+-use deno_core::serde::Serializer;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Deserializer;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde::Serializer;
+ use lazy_regex::lazy_regex;
+ use once_cell::sync::Lazy;
+ use regex::Regex;
+@@ -381,8 +381,8 @@ impl Error for Diagnostics {}
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::serde_json;
+-  use deno_core::serde_json::json;
++  use ::deno_core::serde_json;
++  use ::deno_core::serde_json::json;
+   use test_util::strip_ansi_codes;
+ 
+   #[test]
+diff --git a/cli/tsc/mod.rs b/cli/tsc/mod.rs
+index 2b8a210..39b9b39 100644
+--- a/cli/tsc/mod.rs
++++ b/cli/tsc/mod.rs
+@@ -7,36 +7,36 @@ use crate::node;
+ use crate::util::checksum;
+ use crate::util::path::mapped_specifier_for_tsc;
+ 
+-use deno_ast::MediaType;
+-use deno_core::anyhow::anyhow;
+-use deno_core::anyhow::Context;
+-use deno_core::ascii_str;
+-use deno_core::error::AnyError;
+-use deno_core::located_script_name;
+-use deno_core::op;
+-use deno_core::resolve_url_or_path;
+-use deno_core::serde::Deserialize;
+-use deno_core::serde::Deserializer;
+-use deno_core::serde::Serialize;
+-use deno_core::serde::Serializer;
+-use deno_core::serde_json;
+-use deno_core::serde_json::json;
+-use deno_core::serde_json::Value;
+-use deno_core::serde_v8;
+-use deno_core::JsRuntime;
+-use deno_core::ModuleSpecifier;
+-use deno_core::OpState;
+-use deno_core::RuntimeOptions;
+-use deno_core::Snapshot;
+-use deno_graph::Module;
+-use deno_graph::ModuleGraph;
+-use deno_graph::ResolutionResolved;
+-use deno_runtime::deno_node;
+-use deno_runtime::deno_node::NodeResolution;
+-use deno_runtime::deno_node::NodeResolutionMode;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::MediaType;
++use ::deno_core::anyhow::anyhow;
++use ::deno_core::anyhow::Context;
++use ::deno_core::ascii_str;
++use ::deno_core::error::AnyError;
++use ::deno_core::located_script_name;
++use ::deno_core::op;
++use ::deno_core::resolve_url_or_path;
++use ::deno_core::serde::Deserialize;
++use ::deno_core::serde::Deserializer;
++use ::deno_core::serde::Serialize;
++use ::deno_core::serde::Serializer;
++use ::deno_core::serde_json;
++use ::deno_core::serde_json::json;
++use ::deno_core::serde_json::Value;
++use ::deno_core::serde_v8;
++use ::deno_core::JsRuntime;
++use ::deno_core::ModuleSpecifier;
++use ::deno_core::OpState;
++use ::deno_core::RuntimeOptions;
++use ::deno_core::Snapshot;
++use ::deno_graph::Module;
++use ::deno_graph::ModuleGraph;
++use ::deno_graph::ResolutionResolved;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::deno_node::NodeResolution;
++use ::deno_runtime::deno_node::NodeResolutionMode;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_semver::npm::NpmPackageReqReference;
+ use lsp_types::Url;
+ use once_cell::sync::Lazy;
+ use std::borrow::Cow;
+@@ -846,9 +846,9 @@ mod tests {
+   use super::DiagnosticCategory;
+   use super::*;
+   use crate::args::TsConfig;
+-  use deno_core::futures::future;
+-  use deno_core::OpState;
+-  use deno_graph::ModuleGraph;
++  use ::deno_core::futures::future;
++  use ::deno_core::OpState;
++  use ::deno_graph::ModuleGraph;
+   use std::fs;
+ 
+   #[derive(Debug, Default)]
+diff --git a/cli/util/console.rs b/cli/util/console.rs
+index dc37138..ae3745d 100644
+--- a/cli/util/console.rs
++++ b/cli/util/console.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_runtime::ops::tty::ConsoleSize;
++use ::deno_runtime::ops::tty::ConsoleSize;
+ 
+ /// Gets the console size.
+ pub fn console_size() -> Option<ConsoleSize> {
+diff --git a/cli/util/display.rs b/cli/util/display.rs
+index 96b6cf8..a79ba65 100644
+--- a/cli/util/display.rs
++++ b/cli/util/display.rs
+@@ -1,7 +1,7 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::error::AnyError;
+-use deno_core::serde_json;
++use ::deno_core::error::AnyError;
++use ::deno_core::serde_json;
+ use std::io::Write;
+ 
+ /// A function that converts a float to a string the represents a human
+diff --git a/cli/util/draw_thread.rs b/cli/util/draw_thread.rs
+index 2fd81a7..7f89a33 100644
+--- a/cli/util/draw_thread.rs
++++ b/cli/util/draw_thread.rs
+@@ -1,9 +1,9 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+ use console_static_text::ConsoleStaticText;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::task::spawn_blocking;
+-use deno_runtime::ops::tty::ConsoleSize;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::task::spawn_blocking;
++use ::deno_runtime::ops::tty::ConsoleSize;
+ use once_cell::sync::Lazy;
+ use std::sync::Arc;
+ use std::time::Duration;
+diff --git a/cli/util/file_watcher.rs b/cli/util/file_watcher.rs
+index 1ad5e9b..bc10575 100644
+--- a/cli/util/file_watcher.rs
++++ b/cli/util/file_watcher.rs
+@@ -3,10 +3,10 @@
+ use crate::colors;
+ use crate::util::fs::canonicalize_path;
+ 
+-use deno_core::error::AnyError;
+-use deno_core::error::JsError;
+-use deno_core::futures::Future;
+-use deno_runtime::fmt_errors::format_js_error;
++use ::deno_core::error::AnyError;
++use ::deno_core::error::JsError;
++use ::deno_core::futures::Future;
++use ::deno_runtime::fmt_errors::format_js_error;
+ use log::info;
+ use notify::event::Event as NotifyEvent;
+ use notify::event::EventKind;
+diff --git a/cli/util/fs.rs b/cli/util/fs.rs
+index 658002e..929e2a1 100644
+--- a/cli/util/fs.rs
++++ b/cli/util/fs.rs
+@@ -1,12 +1,12 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-pub use deno_core::normalize_path;
+-use deno_core::task::spawn_blocking;
+-use deno_core::ModuleSpecifier;
+-use deno_runtime::deno_crypto::rand;
+-use deno_runtime::deno_node::PathClean;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++pub use ::deno_core::normalize_path;
++use ::deno_core::task::spawn_blocking;
++use ::deno_core::ModuleSpecifier;
++use ::deno_runtime::deno_crypto::rand;
++use ::deno_runtime::deno_node::PathClean;
+ use std::borrow::Cow;
+ use std::env::current_dir;
+ use std::fs::OpenOptions;
+@@ -594,8 +594,8 @@ impl LaxSingleProcessFsFlag {
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::futures;
+-  use deno_core::parking_lot::Mutex;
++  use ::deno_core::futures;
++  use ::deno_core::parking_lot::Mutex;
+   use pretty_assertions::assert_eq;
+   use test_util::TempDir;
+   use tokio::sync::Notify;
+diff --git a/cli/util/path.rs b/cli/util/path.rs
+index 39ba96d..17fef1c 100644
+--- a/cli/util/path.rs
++++ b/cli/util/path.rs
+@@ -4,10 +4,10 @@ use std::borrow::Cow;
+ use std::path::Path;
+ use std::path::PathBuf;
+ 
+-use deno_ast::MediaType;
+-use deno_ast::ModuleSpecifier;
+-use deno_core::error::uri_error;
+-use deno_core::error::AnyError;
++use ::deno_ast::MediaType;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::error::uri_error;
++use ::deno_core::error::AnyError;
+ 
+ /// Checks if the path has extension Deno supports.
+ pub fn is_supported_ext(path: &Path) -> bool {
+diff --git a/cli/util/progress_bar/mod.rs b/cli/util/progress_bar/mod.rs
+index 65bc00e..787318a 100644
+--- a/cli/util/progress_bar/mod.rs
++++ b/cli/util/progress_bar/mod.rs
+@@ -5,8 +5,8 @@ use std::sync::atomic::Ordering;
+ use std::sync::Arc;
+ use std::time::SystemTime;
+ 
+-use deno_core::parking_lot::Mutex;
+-use deno_runtime::ops::tty::ConsoleSize;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_runtime::ops::tty::ConsoleSize;
+ 
+ use crate::colors;
+ 
+diff --git a/cli/util/progress_bar/renderer.rs b/cli/util/progress_bar/renderer.rs
+index 5635ad3..ec76ae4 100644
+--- a/cli/util/progress_bar/renderer.rs
++++ b/cli/util/progress_bar/renderer.rs
+@@ -2,7 +2,7 @@
+ 
+ use std::time::Duration;
+ 
+-use deno_runtime::colors;
++use ::deno_runtime::colors;
+ 
+ use crate::util::display::human_download_size;
+ 
+diff --git a/cli/util/text_encoding.rs b/cli/util/text_encoding.rs
+index 29a8d40..1168700 100644
+--- a/cli/util/text_encoding.rs
++++ b/cli/util/text_encoding.rs
+@@ -1,6 +1,6 @@
+ // Copyright 2018-2023 the Deno authors. All rights reserved. MIT license.
+ 
+-use deno_core::ModuleCode;
++use ::deno_core::ModuleCode;
+ use encoding_rs::*;
+ use std::borrow::Cow;
+ use std::io::Error;
+diff --git a/cli/watcher.rs b/cli/watcher.rs
+index f9c2c1b..9c3bfe5 100644
+--- a/cli/watcher.rs
++++ b/cli/watcher.rs
+@@ -5,8 +5,8 @@ use crate::cache::ParsedSourceCache;
+ use crate::graph_util::ModuleGraphContainer;
+ use crate::module_loader::CjsResolutionStore;
+ 
+-use deno_core::parking_lot::Mutex;
+-use deno_core::ModuleSpecifier;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::ModuleSpecifier;
+ 
+ use std::path::PathBuf;
+ use std::sync::Arc;
+diff --git a/cli/worker.rs b/cli/worker.rs
+index 4a41da1..2062a6d 100644
+--- a/cli/worker.rs
++++ b/cli/worker.rs
+@@ -4,40 +4,40 @@ use std::path::PathBuf;
+ use std::rc::Rc;
+ use std::sync::Arc;
+ 
+-use deno_ast::ModuleSpecifier;
+-use deno_core::anyhow::Context;
+-use deno_core::error::AnyError;
+-use deno_core::futures::task::LocalFutureObj;
+-use deno_core::futures::FutureExt;
+-use deno_core::located_script_name;
+-use deno_core::parking_lot::Mutex;
+-use deno_core::url::Url;
+-use deno_core::CompiledWasmModuleStore;
+-use deno_core::Extension;
+-use deno_core::ModuleId;
+-use deno_core::ModuleLoader;
+-use deno_core::SharedArrayBufferStore;
+-use deno_core::SourceMapGetter;
+-use deno_lockfile::Lockfile;
+-use deno_runtime::colors;
+-use deno_runtime::deno_broadcast_channel::InMemoryBroadcastChannel;
+-use deno_runtime::deno_fs;
+-use deno_runtime::deno_node;
+-use deno_runtime::deno_node::NodeResolution;
+-use deno_runtime::deno_node::NodeResolver;
+-use deno_runtime::deno_tls::RootCertStoreProvider;
+-use deno_runtime::deno_web::BlobStore;
+-use deno_runtime::fmt_errors::format_js_error;
+-use deno_runtime::inspector_server::InspectorServer;
+-use deno_runtime::ops::worker_host::CreateWebWorkerCb;
+-use deno_runtime::ops::worker_host::WorkerEventCb;
+-use deno_runtime::permissions::PermissionsContainer;
+-use deno_runtime::web_worker::WebWorker;
+-use deno_runtime::web_worker::WebWorkerOptions;
+-use deno_runtime::worker::MainWorker;
+-use deno_runtime::worker::WorkerOptions;
+-use deno_runtime::BootstrapOptions;
+-use deno_semver::npm::NpmPackageReqReference;
++use ::deno_ast::ModuleSpecifier;
++use ::deno_core::anyhow::Context;
++use ::deno_core::error::AnyError;
++use ::deno_core::futures::task::LocalFutureObj;
++use ::deno_core::futures::FutureExt;
++use ::deno_core::located_script_name;
++use ::deno_core::parking_lot::Mutex;
++use ::deno_core::url::Url;
++use ::deno_core::CompiledWasmModuleStore;
++use ::deno_core::Extension;
++use ::deno_core::ModuleId;
++use ::deno_core::ModuleLoader;
++use ::deno_core::SharedArrayBufferStore;
++use ::deno_core::SourceMapGetter;
++use ::deno_lockfile::Lockfile;
++use ::deno_runtime::colors;
++use ::deno_runtime::deno_broadcast_channel::InMemoryBroadcastChannel;
++use ::deno_runtime::deno_fs;
++use ::deno_runtime::deno_node;
++use ::deno_runtime::deno_node::NodeResolution;
++use ::deno_runtime::deno_node::NodeResolver;
++use ::deno_runtime::deno_tls::RootCertStoreProvider;
++use ::deno_runtime::deno_web::BlobStore;
++use ::deno_runtime::fmt_errors::format_js_error;
++use ::deno_runtime::inspector_server::InspectorServer;
++use ::deno_runtime::ops::worker_host::CreateWebWorkerCb;
++use ::deno_runtime::ops::worker_host::WorkerEventCb;
++use ::deno_runtime::permissions::PermissionsContainer;
++use ::deno_runtime::web_worker::WebWorker;
++use ::deno_runtime::web_worker::WebWorkerOptions;
++use ::deno_runtime::worker::MainWorker;
++use ::deno_runtime::worker::WorkerOptions;
++use ::deno_runtime::BootstrapOptions;
++use ::deno_semver::npm::NpmPackageReqReference;
+ 
+ use crate::args::StorageKeyResolver;
+ use crate::errors;
+@@ -616,8 +616,8 @@ fn create_web_worker_callback(
+ #[cfg(test)]
+ mod tests {
+   use super::*;
+-  use deno_core::resolve_path;
+-  use deno_runtime::permissions::Permissions;
++  use ::deno_core::resolve_path;
++  use ::deno_runtime::permissions::Permissions;
+ 
+   fn create_test_worker() -> MainWorker {
+     let main_module =

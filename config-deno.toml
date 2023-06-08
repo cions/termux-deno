@@ -1,0 +1,39 @@
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = 3
+strip = "symbols"
+
+[profile.release.build-override]
+opt-level = 3
+
+[target."aarch64-linux-android"]
+linker = "clang"
+rustflags = ["-C", "target-cpu=kryo", "-C", "target-feature=+fp16,+lse", "-C", "default-linker-libraries=yes"]
+
+[registries.crates-io]
+protocol = "sparse"
+
+[patch.crates-io]
+deno_fs = { path = "deno/ext/fs" }
+deno_net = { path = "deno/ext/net" }
+deno_node = { path = "deno/ext/node" }
+deno_runtime = { path = "deno/runtime" }
+v8 = { path = "rusty_v8" }
+
+[env]
+CC = "clang"
+CXX = "clang++"
+LD = "ld.lld"
+AR = "llvm-ar"
+NM = "llvm-nm"
+CC_aarch64_linux_android = "clang"
+CXX_aarch64_linux_android = "clang++"
+AR_aarch64_linux_android = "llvm-ar"
+NM_aarch64_linux_android = "llvm-nm"
+CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -fsplit-lto-unit -pipe"
+CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -fsplit-lto-unit -pipe"
+CXXSTDLIB = "c++_shared"
+
+RUSTY_V8_ARCHIVE = { value = "librusty_v8.a", relative = true }
+GN_ARGS = "use_custom_libcxx=false"
