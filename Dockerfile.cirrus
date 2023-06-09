@@ -1,0 +1,28 @@
+FROM --platform=linux/arm64 golang:latest AS resolver
+
+COPY resolve.go /
+
+RUN go run /resolve.go \
+        api.cirrus-ci.com \
+        packages-cf.termux.dev \
+        github.com \
+        chromium.googlesource.com \
+        crates.io \
+        index.crates.io \
+        static.crates.io \
+    > /hosts
+
+
+FROM --platform=linux/arm64 termux/termux-docker:aarch64
+
+COPY --from=resolver /hosts /system/etc/hosts
+
+USER system
+
+RUN apt-get update -qq \
+ && apt-get install -qy --no-install-recommends \
+        git \
+        make \
+        patch \
+        rust \
+ && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm
