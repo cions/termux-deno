@@ -1,7 +1,6 @@
-load("cirrus", "env", "http")
-load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts", "file_from_env")
+load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.34.1"
+DENO_VERSION = "v1.34.2"
 RUSTY_V8_VERSION = "v0.73.0"
 
 
@@ -73,6 +72,7 @@ def main():
         ),
         task(
             name="Build deno",
+            alias="deno",
             depends_on=["Build librusty_v8.a"],
             instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="16G", greedy=True),
             env={
@@ -94,9 +94,9 @@ def main():
                     'patch -d rusty_v8 -p1 < rusty_v8.patch',
 
                     'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" -vv --path deno/cli',
-                    'mv "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno" deno',
+                    'rm -rf deno && mv "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno" deno',
                 ),
-                artifacts("deno-aarch64-android", "deno"),
+                artifacts("deno-aarch64-android", "deno", type="application/x-executable"),
             ],
         ),
     ]
