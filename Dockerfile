@@ -1,5 +1,5 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.34.2"
+ARG DENO_VERSION="v1.34.3"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail -n1 | jq -r '.deps[] | select(.name == "v8").req'
 ARG RUSTY_V8_VERSION="v0.73.0"
 
@@ -42,8 +42,8 @@ RUN echo "deb https://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-${LLVM_VERS
         llvm-${LLVM_VERSION} \
  && rm -rf /var/lib/apt/lists/*
 
-RUN rustup toolchain install nightly \
- && rustup default nightly \
+RUN rustup toolchain install stable \
+ && rustup default stable \
  && rustup target add "${TARGET}"
 
 RUN curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
@@ -68,7 +68,11 @@ ENV CC="${CC_aarch64_linux_android}" \
     BUILD_CXX="${CXX_x86_64_unknown_linux_gnu}" \
     BUILD_AR="${AR_x86_64_unknown_linux_gnu}" \
     BUILD_NM="${NM_x86_64_unknown_linux_gnu}"
-ENV CARGO_BUILD_TARGET_DIR="/cargo-build" \
+ENV __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS="nightly" \
+    CARGO_UNSTABLE_HOST_CONFIG="true" \
+    CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST="true" \
+    CARGO_TARGET_APPLIES_TO_HOST="false" \
+    CARGO_BUILD_TARGET_DIR="/cargo-build" \
     CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="${CC_aarch64_linux_android}" \
     CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER="${CC_x86_64_unknown_linux_gnu}"
 
@@ -76,11 +80,12 @@ ARG RUSTY_V8_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
         --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" /rusty_v8
 
-COPY rusty_v8.patch /
+COPY *.patch /
 
 WORKDIR /rusty_v8
 
-RUN patch -p1 < /rusty_v8.patch
+RUN patch -p1 < /rusty_v8.patch \
+ && patch -p1 < /rusty_v8-custom-toolchain.patch
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
@@ -96,11 +101,12 @@ USER system
 
 RUN apt-get update -qq \
  && apt-get install -qy --no-install-recommends \
+        binutils-is-llvm \
         git \
         make \
         patch \
         rust \
- && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm
+ && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
 
 ARG DENO_VERSION
 ARG RUSTY_V8_VERSION
@@ -113,6 +119,7 @@ COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
 COPY --chown=system *.patch .
 
 RUN patch -d deno -p1 < deno-android.patch \
+ && patch -d deno -p1 < deno-libffi-sys.patch \
  && patch -d deno -p1 < deno-ambiguous-name.patch \
  && patch -d rusty_v8 -p1 < rusty_v8.patch
 

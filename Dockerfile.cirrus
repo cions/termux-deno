@@ -17,12 +17,18 @@ FROM --platform=linux/arm64 termux/termux-docker:aarch64
 
 COPY --from=resolver /hosts /system/etc/hosts
 
+RUN sed -z -i '/Warning: "%s" unused DT entry: %s (type %p arg %p) (ignoring)/s/./\x00/g' /system/bin/linker64
+RUN sed -z -i '/WARNING: linker: /{s/./\x00/g;n;s/./ /g}' /system/bin/linker64
+RUN sed -z -i '/^linker$/s/./\x00/g' /system/bin/linker64
+RUN sed -z -i '/^: $/s/./ /g' /system/bin/linker64
+
 USER system
 
 RUN apt-get update -qq \
  && apt-get install -qy --no-install-recommends \
+        binutils-is-llvm \
         git \
         make \
         patch \
         rust \
- && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm
+ && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"

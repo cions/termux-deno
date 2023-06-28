@@ -1,69 +1,6 @@
-Submodule build contains modified content
-diff --git a/build/config/BUILD.gn b/build/config/BUILD.gn
-index ed793c8f..ecf1c565 100644
---- a/build/config/BUILD.gn
-+++ b/build/config/BUILD.gn
-@@ -204,6 +204,7 @@ config("default_libs") {
-     libs = [
-       "dl",
-       "m",
-+      "unwind",
-     ]
-   } else if (is_mac) {
-     # Targets should choose to explicitly link frameworks they require. Since
-diff --git a/build/toolchain/gcc_toolchain.gni b/build/toolchain/gcc_toolchain.gni
-index ad994319..dbbb8093 100644
---- a/build/toolchain/gcc_toolchain.gni
-+++ b/build/toolchain/gcc_toolchain.gni
-@@ -859,22 +859,32 @@ template("gcc_toolchain") {
- # use_gold too.
- template("clang_toolchain") {
-   gcc_toolchain(target_name) {
--    _path = "$clang_base_path/bin"
--    _is_path_absolute = get_path_info(_path, "abspath") == _path
-+    assert(defined(invoker.toolchain_args))
-+    invoker_toolchain_args = invoker.toolchain_args
-+    assert(defined(invoker_toolchain_args.current_os))
- 
--    # Preserve absolute paths for tools like distcc.
--    if (_is_path_absolute && filter_include([ _path ], [ "//*" ]) == []) {
--      prefix = _path
-+    if (invoker_toolchain_args.current_os == host_os) {
-+      cc = getenv("BUILD_CC")
-+      cxx = getenv("BUILD_CXX")
-+      ar = getenv("BUILD_AR")
-+      nm = getenv("BUILD_NM")
-+
-+      extra_cflags = getenv("BUILD_CFLAGS")
-+      extra_cxxflags = getenv("BUILD_CXXFLAGS")
-+      extra_ldflags = getenv("BUILD_LDFLAGS")
-     } else {
--      prefix = rebase_path(_path, root_build_dir)
-+      cc = getenv("CC")
-+      cxx = getenv("CXX")
-+      ar = getenv("AR")
-+      nm = getenv("NM")
-+
-+      extra_cflags = getenv("CFLAGS")
-+      extra_cxxflags = getenv("CXXFLAGS")
-+      extra_ldflags = getenv("LDFLAGS")
-     }
- 
--    cc = "${prefix}/clang"
--    cxx = "${prefix}/clang++"
-     ld = cxx
--    readelf = "${prefix}/llvm-readelf"
--    ar = "${prefix}/llvm-ar"
--    nm = "${prefix}/llvm-nm"
-+    readelf = "llvm-readelf"
- 
-     forward_variables_from(invoker,
-                            [
-diff --git a/build.rs b/build.rs
-index 5c1698a..cc901fd 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -22,6 +22,7 @@ fn main() {
+@@ -23,6 +23,7 @@ fn main() {
    let envs = vec![
      "CCACHE",
      "CLANG_BASE_PATH",
@@ -71,7 +8,7 @@ index 5c1698a..cc901fd 100644
      "DENO_TRYBUILD",
      "DOCS_RS",
      "GN",
-@@ -260,25 +261,23 @@ fn maybe_install_sysroot(arch: &str) {
+@@ -261,25 +262,23 @@ fn maybe_install_sysroot(arch: &str) {
  }
  
  fn platform() -> String {
@@ -113,7 +50,7 @@ index 5c1698a..cc901fd 100644
  
    format!("{os}-{arch}")
  }
-@@ -467,16 +466,23 @@ fn print_link_flags() {
+@@ -481,16 +480,24 @@ fn print_link_flags() {
  
    if should_dyn_link_libcxx {
      // Based on https://github.com/alexcrichton/cc-rs/blob/fba7feded71ee4f63cfe885673ead6d7b4f2f454/src/lib.rs#L2462
@@ -133,21 +70,22 @@ index 5c1698a..cc901fd 100644
 +      }
 +    } else {
 +      let target = env::var("TARGET").unwrap();
-+      if target.contains("apple") {
-+        println!("cargo:rustc-link-lib=dylib=c++");
-+      } else if target.contains("freebsd") {
-+        println!("cargo:rustc-link-lib=dylib=c++");
-+      } else if target.contains("openbsd") {
++      if target.contains("msvc") {
++        // nothing to link to
++      } else if target.contains("apple")
++        || target.contains("freebsd")
++        || target.contains("openbsd")
++      {
 +        println!("cargo:rustc-link-lib=dylib=c++");
 +      } else if target.contains("android") {
 +        println!("cargo:rustc-link-lib=dylib=c++_shared");
-+      } else if !target.contains("msvc") {
++      } else {
 +        println!("cargo:rustc-link-lib=dylib=stdc++");
 +      }
      }
    }
  
-@@ -530,10 +536,6 @@ fn is_compatible_clang_version(clang_path: &Path) -> bool {
+@@ -544,10 +551,6 @@ fn is_compatible_clang_version(clang_path: &Path) -> bool {
  }
  
  fn find_compatible_system_clang() -> Option<PathBuf> {
@@ -158,7 +96,7 @@ index 5c1698a..cc901fd 100644
    if let Ok(p) = env::var("CLANG_BASE_PATH") {
      let base_path = Path::new(&p);
      let clang_path = base_path.join("bin").join("clang");
-@@ -672,6 +674,10 @@ fn ninja(gn_out_dir: &Path, maybe_env: Option<NinjaEnv>) -> Command {
+@@ -686,6 +689,10 @@ fn ninja(gn_out_dir: &Path, maybe_env: Option<NinjaEnv>) -> Command {
    let mut cmd = Command::new(cmd_string);
    cmd.arg("-C");
    cmd.arg(gn_out_dir);

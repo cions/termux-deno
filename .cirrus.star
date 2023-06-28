@@ -1,6 +1,6 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.34.2"
+DENO_VERSION = "v1.34.3"
 RUSTY_V8_VERSION = "v0.73.0"
 
 
@@ -39,6 +39,10 @@ def main():
                 "BUILD_CXX": "${CXX_x86_64_unknown_linux_gnu}",
                 "BUILD_AR": "${AR_x86_64_unknown_linux_gnu}",
                 "BUILD_NM": "${NM_x86_64_unknown_linux_gnu}",
+                "__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS": "nightly",
+                "CARGO_UNSTABLE_HOST_CONFIG": "true",
+                "CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST": "true",
+                "CARGO_TARGET_APPLIES_TO_HOST": "false",
                 "CARGO_BUILD_TARGET_DIR": "${CIRRUS_WORKING_DIR}/cargo-build",
                 "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER": "${CC_aarch64_linux_android}",
                 "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "${CC_x86_64_unknown_linux_gnu}",
@@ -51,8 +55,8 @@ def main():
                     'apt-get update -qq',
                     'apt-get install -qy --no-install-recommends clang-${LLVM_VERSION} libc++1-${LLVM_VERSION} libclang-rt-${LLVM_VERSION}-dev lld-${LLVM_VERSION} llvm-${LLVM_VERSION}',
 
-                    'rustup toolchain install nightly',
-                    'rustup default nightly',
+                    'rustup toolchain install stable',
+                    'rustup default stable',
                     'rustup target add "${TARGET}"',
 
                     'curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip"',
@@ -63,8 +67,9 @@ def main():
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
                     'patch -d rusty_v8 -p1 < rusty_v8.patch',
+                    'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
 
-                    'cargo +nightly -Z unstable-options -C rusty_v8 build --release -vv',
+                    'cargo +stable -Z unstable-options -C rusty_v8 build --release -vv',
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" librusty_v8.a',
                 ),
                 artifacts("librusty_v8-aarch64-android", "librusty_v8.a"),
@@ -90,6 +95,7 @@ def main():
                     'git clone --filter=tree:0 --recurse-submodules --also-filter-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
 
                     'patch -d deno -p1 < deno-android.patch',
+                    'patch -d deno -p1 < deno-libffi-sys.patch',
                     'patch -d deno -p1 < deno-ambiguous-name.patch',
                     'patch -d rusty_v8 -p1 < rusty_v8.patch',
 

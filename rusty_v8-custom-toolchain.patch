@@ -1,0 +1,46 @@
+--- a/build/toolchain/gcc_toolchain.gni
++++ b/build/toolchain/gcc_toolchain.gni
+@@ -859,22 +859,32 @@ template("gcc_toolchain") {
+ # use_gold too.
+ template("clang_toolchain") {
+   gcc_toolchain(target_name) {
+-    _path = "$clang_base_path/bin"
+-    _is_path_absolute = get_path_info(_path, "abspath") == _path
++    assert(defined(invoker.toolchain_args))
++    invoker_toolchain_args = invoker.toolchain_args
++    assert(defined(invoker_toolchain_args.current_os))
+ 
+-    # Preserve absolute paths for tools like distcc.
+-    if (_is_path_absolute && filter_include([ _path ], [ "//*" ]) == []) {
+-      prefix = _path
++    if (invoker_toolchain_args.current_os == host_os) {
++      cc = getenv("BUILD_CC")
++      cxx = getenv("BUILD_CXX")
++      ar = getenv("BUILD_AR")
++      nm = getenv("BUILD_NM")
++
++      extra_cflags = getenv("BUILD_CFLAGS")
++      extra_cxxflags = getenv("BUILD_CXXFLAGS")
++      extra_ldflags = getenv("BUILD_LDFLAGS")
+     } else {
+-      prefix = rebase_path(_path, root_build_dir)
++      cc = getenv("CC")
++      cxx = getenv("CXX")
++      ar = getenv("AR")
++      nm = getenv("NM")
++
++      extra_cflags = getenv("CFLAGS")
++      extra_cxxflags = getenv("CXXFLAGS")
++      extra_ldflags = getenv("LDFLAGS")
+     }
+ 
+-    cc = "${prefix}/clang"
+-    cxx = "${prefix}/clang++"
+     ld = cxx
+-    readelf = "${prefix}/llvm-readelf"
+-    ar = "${prefix}/llvm-ar"
+-    nm = "${prefix}/llvm-nm"
++    readelf = "llvm-readelf"
+ 
+     forward_variables_from(invoker,
+                            [

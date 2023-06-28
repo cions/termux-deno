@@ -1,7 +1,3 @@
-[unstable]
-host-config = true
-target-applies-to-host = true
-
 [build]
 target = "aarch64-linux-android"
 
