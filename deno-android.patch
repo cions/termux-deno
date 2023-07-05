@@ -1,6 +1,6 @@
 --- a/cli/build.rs
 +++ b/cli/build.rs
-@@ -418,13 +418,20 @@ fn main() {
+@@ -415,13 +415,20 @@ fn main() {
      panic!("Cross compiling with snapshot is not supported.");
    }
  
@@ -28,7 +28,7 @@
  
    #[cfg(target_os = "windows")]
    println!(
-@@ -455,6 +462,12 @@ fn main() {
+@@ -452,6 +459,12 @@ fn main() {
      }
    }
  
@@ -65,7 +65,7 @@
    let socket_addr = socket2::SockAddr::from(addr);
 --- a/ext/net/ops_tls.rs
 +++ b/ext/net/ops_tls.rs
-@@ -1076,7 +1076,7 @@ where
+@@ -1074,7 +1074,7 @@ where
    #[cfg(not(windows))]
    socket.set_reuse_address(true)?;
    if args.reuse_port {
@@ -76,7 +76,7 @@
    let socket_addr = socket2::SockAddr::from(bind_addr);
 --- a/ext/node/lib.rs
 +++ b/ext/node/lib.rs
-@@ -129,12 +129,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
+@@ -122,12 +122,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
  
  #[op]
  fn op_node_build_os() -> String {

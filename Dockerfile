@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.34.3"
+ARG DENO_VERSION="v1.35.0"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail -n1 | jq -r '.deps[] | select(.name == "v8").req'
-ARG RUSTY_V8_VERSION="v0.73.0"
+ARG RUSTY_V8_VERSION="v0.74.1"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -47,7 +47,7 @@ RUN rustup toolchain install stable \
  && rustup target add "${TARGET}"
 
 RUN curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
- && unzip -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
+ && unzip -q -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
  && rm -rf "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
  && ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"
 
@@ -89,7 +89,7 @@ RUN patch -p1 < /rusty_v8.patch \
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
-RUN cargo +nightly build --release -vv \
+RUN cargo +stable build --release -vv \
  && mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" /librusty_v8.a
 
 
@@ -119,8 +119,6 @@ COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
 COPY --chown=system *.patch .
 
 RUN patch -d deno -p1 < deno-android.patch \
- && patch -d deno -p1 < deno-libffi-sys.patch \
- && patch -d deno -p1 < deno-ambiguous-name.patch \
  && patch -d rusty_v8 -p1 < rusty_v8.patch
 
 COPY --chown=system config-deno.toml .cargo/config.toml

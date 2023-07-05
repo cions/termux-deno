@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.34.3"
-RUSTY_V8_VERSION = "v0.73.0"
+DENO_VERSION = "v1.35.0"
+RUSTY_V8_VERSION = "v0.74.1"
 
 
 def main():
@@ -63,11 +63,11 @@ def main():
                     'unzip -q -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip"',
                     'ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"',
 
-                    'install -D config-rusty_v8.toml .cargo/config.toml',
-
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
                     'patch -d rusty_v8 -p1 < rusty_v8.patch',
                     'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
+
+                    'install -D config-rusty_v8.toml .cargo/config.toml',
 
                     'cargo +stable -Z unstable-options -C rusty_v8 build --release -vv',
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" librusty_v8.a',
@@ -89,15 +89,13 @@ def main():
                 script("build",
                     'curl -fsSLO "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/librusty_v8-aarch64-android/librusty_v8.a"',
 
-                    'install -D config-deno.toml .cargo/config.toml',
-
                     'git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
                     'git clone --filter=tree:0 --recurse-submodules --also-filter-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
 
                     'patch -d deno -p1 < deno-android.patch',
-                    'patch -d deno -p1 < deno-libffi-sys.patch',
-                    'patch -d deno -p1 < deno-ambiguous-name.patch',
                     'patch -d rusty_v8 -p1 < rusty_v8.patch',
+
+                    'install -D config-deno.toml .cargo/config.toml',
 
                     'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" -vv --path deno/cli',
                     'rm -rf deno && mv "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno" deno',
