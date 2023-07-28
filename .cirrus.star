@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.35.0"
-RUSTY_V8_VERSION = "v0.74.1"
+DENO_VERSION = "v1.35.3"
+RUSTY_V8_VERSION = "v0.74.3"
 
 
 def main():
@@ -64,7 +64,6 @@ def main():
                     'ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
-                    'patch -d rusty_v8 -p1 < rusty_v8.patch',
                     'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
 
                     'install -D config-rusty_v8.toml .cargo/config.toml',
@@ -90,10 +89,8 @@ def main():
                     'curl -fsSLO "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/librusty_v8-aarch64-android/librusty_v8.a"',
 
                     'git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
-                    'git clone --filter=tree:0 --recurse-submodules --also-filter-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
 
                     'patch -d deno -p1 < deno-android.patch',
-                    'patch -d rusty_v8 -p1 < rusty_v8.patch',
 
                     'install -D config-deno.toml .cargo/config.toml',
 

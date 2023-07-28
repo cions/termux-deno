@@ -19,7 +19,6 @@ deno_fs = { path = "deno/ext/fs" }
 deno_net = { path = "deno/ext/net" }
 deno_node = { path = "deno/ext/node" }
 deno_runtime = { path = "deno/runtime" }
-v8 = { path = "rusty_v8" }
 
 [env]
 CC = "clang"

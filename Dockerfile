@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.35.0"
+ARG DENO_VERSION="v1.35.3"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail -n1 | jq -r '.deps[] | select(.name == "v8").req'
-ARG RUSTY_V8_VERSION="v0.74.1"
+ARG RUSTY_V8_VERSION="v0.74.3"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -84,8 +84,7 @@ COPY *.patch /
 
 WORKDIR /rusty_v8
 
-RUN patch -p1 < /rusty_v8.patch \
- && patch -p1 < /rusty_v8-custom-toolchain.patch
+RUN patch -p1 < /rusty_v8-custom-toolchain.patch
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
@@ -110,16 +109,13 @@ RUN apt-get update -qq \
 
 ARG DENO_VERSION
 ARG RUSTY_V8_VERSION
-RUN git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno \
- && git clone --filter=tree:0 --recurse-submodules --also-filter-submodules \
-        --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8
+RUN git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
 
 COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
 
 COPY --chown=system *.patch .
 
-RUN patch -d deno -p1 < deno-android.patch \
- && patch -d rusty_v8 -p1 < rusty_v8.patch
+RUN patch -d deno -p1 < deno-android.patch
 
 COPY --chown=system config-deno.toml .cargo/config.toml
 
