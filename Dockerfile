@@ -1,5 +1,5 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.35.3"
+ARG DENO_VERSION="v1.36.0"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail -n1 | jq -r '.deps[] | select(.name == "v8").req'
 ARG RUSTY_V8_VERSION="v0.74.3"
 

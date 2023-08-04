@@ -1,6 +1,6 @@
 --- a/cli/build.rs
 +++ b/cli/build.rs
-@@ -415,13 +415,20 @@ fn main() {
+@@ -417,13 +417,20 @@ fn main() {
      panic!("Cross compiling with snapshot is not supported.");
    }
  
@@ -28,7 +28,7 @@
  
    #[cfg(target_os = "windows")]
    println!(
-@@ -452,6 +459,12 @@ fn main() {
+@@ -456,6 +463,12 @@ fn main() {
      }
    }
  
@@ -65,7 +65,7 @@
    let socket_addr = socket2::SockAddr::from(addr);
 --- a/ext/net/ops_tls.rs
 +++ b/ext/net/ops_tls.rs
-@@ -1074,7 +1074,7 @@ where
+@@ -1073,7 +1073,7 @@ where
    #[cfg(not(windows))]
    socket.set_reuse_address(true)?;
    if args.reuse_port {
@@ -76,7 +76,7 @@
    let socket_addr = socket2::SockAddr::from(bind_addr);
 --- a/ext/node/lib.rs
 +++ b/ext/node/lib.rs
-@@ -122,12 +122,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
+@@ -132,12 +132,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
  
  #[op]
  fn op_node_build_os() -> String {
@@ -92,10 +92,22 @@
 +  }
  }
  
- deno_core::extension!(deno_node,
+ #[op(fast)]
+--- a/ext/node/ops/os.rs
++++ b/ext/node/ops/os.rs
+@@ -66,6 +66,9 @@ mod priority {
+   #[cfg(target_os = "linux")]
+   #[allow(non_camel_case_types)]
+   type priority_t = u32;
++  #[cfg(target_os = "android")]
++  #[allow(non_camel_case_types)]
++  type priority_t = i32;
+ 
+   const PRIORITY_HIGH: i32 = -14;
+ 
 --- a/runtime/ops/os/mod.rs
 +++ b/runtime/ops/os/mod.rs
-@@ -306,7 +306,7 @@ fn op_runtime_memory_usage(scope: &mut v8::HandleScope) -> MemoryUsage {
+@@ -305,7 +305,7 @@ fn op_runtime_memory_usage(scope: &mut v8::HandleScope) -> MemoryUsage {
    }
  }
  
@@ -124,7 +136,7 @@
    {
      #[allow(clippy::disallowed_methods)]
      match std::fs::read_to_string("/proc/sys/kernel/osrelease") {
-@@ -194,7 +194,7 @@ pub fn mem_info() -> Option<MemInfo> {
+@@ -198,7 +198,7 @@ pub fn mem_info() -> Option<MemInfo> {
      swap_total: 0,
      swap_free: 0,
    };
@@ -133,7 +145,7 @@
    {
      let mut info = std::mem::MaybeUninit::uninit();
      // SAFETY: `info` is a valid pointer to a `libc::sysinfo` struct.
-@@ -327,7 +327,7 @@ pub fn mem_info() -> Option<MemInfo> {
+@@ -331,7 +331,7 @@ pub fn mem_info() -> Option<MemInfo> {
  pub fn os_uptime() -> u64 {
    let uptime: u64;
  
