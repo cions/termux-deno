@@ -1,6 +1,6 @@
 --- a/cli/build.rs
 +++ b/cli/build.rs
-@@ -417,13 +417,20 @@ fn main() {
+@@ -404,13 +404,20 @@ fn main() {
      panic!("Cross compiling with snapshot is not supported.");
    }
  
@@ -28,7 +28,7 @@
  
    #[cfg(target_os = "windows")]
    println!(
-@@ -456,6 +463,12 @@ fn main() {
+@@ -443,6 +450,12 @@ fn main() {
      }
    }
  
@@ -65,7 +65,7 @@
    let socket_addr = socket2::SockAddr::from(addr);
 --- a/ext/net/ops_tls.rs
 +++ b/ext/net/ops_tls.rs
-@@ -1073,7 +1073,7 @@ where
+@@ -1079,7 +1079,7 @@ where
    #[cfg(not(windows))]
    socket.set_reuse_address(true)?;
    if args.reuse_port {
@@ -76,17 +76,12 @@
    let socket_addr = socket2::SockAddr::from(bind_addr);
 --- a/ext/node/lib.rs
 +++ b/ext/node/lib.rs
-@@ -132,12 +132,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
+@@ -131,7 +131,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
  
  #[op]
  fn op_node_build_os() -> String {
--  std::env::var("TARGET")
--    .unwrap()
--    .split('-')
--    .nth(2)
--    .unwrap()
--    .to_string()
-+  match std::env::var("TARGET").unwrap().as_str() {
+-  env!("TARGET").split('-').nth(2).unwrap().to_string()
++  match env!("TARGET") {
 +    "aarch64-linux-android" => "linux".to_string(),
 +    target => target.split('-').nth(2).unwrap().to_string(),
 +  }
@@ -95,7 +90,7 @@
  #[op(fast)]
 --- a/ext/node/ops/os.rs
 +++ b/ext/node/ops/os.rs
-@@ -66,6 +66,9 @@ mod priority {
+@@ -70,6 +70,9 @@ mod priority {
    #[cfg(target_os = "linux")]
    #[allow(non_camel_case_types)]
    type priority_t = u32;

@@ -27,6 +27,7 @@ USER system
 RUN apt-get update -qq \
  && apt-get install -qy --no-install-recommends \
         binutils-is-llvm \
+        cmake \
         git \
         make \
         patch \
