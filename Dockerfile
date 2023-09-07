@@ -1,7 +1,7 @@
-# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.36.3"
-# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail -n1 | jq -r '.deps[] | select(.name == "v8").req'
-ARG RUSTY_V8_VERSION="v0.74.3"
+# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
+ARG DENO_VERSION="v1.37.0"
+# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail | jq -r '"\(.vers): v8 \(.deps[] | select(.name == "v8") | .req)"'
+ARG RUSTY_V8_VERSION="v0.76.0"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -32,7 +32,7 @@ ENV ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sy
 ENV CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
 RUN echo "deb https://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
- && curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc "https://apt.llvm.org/llvm-snapshot.gpg.key" \
+ && curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key \
  && apt-get update -qq \
  && apt-get install -qy --no-install-recommends \
         clang-${LLVM_VERSION} \
@@ -78,17 +78,15 @@ ENV __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS="nightly" \
 
 ARG RUSTY_V8_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" /rusty_v8
+        --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8
 
-COPY *.patch /
+COPY *.patch .
 
-WORKDIR /rusty_v8
-
-RUN patch -p1 < /rusty_v8-custom-toolchain.patch
+RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
-RUN cargo +stable build --release -vv \
+RUN cargo +stable -Z unstable-options -C rusty_v8 build --release -vv \
  && mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" /librusty_v8.a
 
 
@@ -110,7 +108,8 @@ RUN apt-get update -qq \
 
 ARG DENO_VERSION
 ARG RUSTY_V8_VERSION
-RUN git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
+RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
+        --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
 
 COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
 
@@ -120,7 +119,7 @@ RUN patch -d deno -p1 < deno-android.patch
 
 COPY --chown=system config-deno.toml .cargo/config.toml
 
-# RUN cargo install --version="${DENO_VERSION#v}" --root="${HOME}/cargo-install" -vv deno
+# RUN cargo install --root="${HOME}/cargo-install" -vv --version="${DENO_VERSION#v}" deno
 RUN cargo install --root="${HOME}/cargo-install" -vv --path deno/cli
 
 

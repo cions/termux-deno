@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.36.3"
-RUSTY_V8_VERSION = "v0.74.3"
+DENO_VERSION = "v1.37.0"
+RUSTY_V8_VERSION = "v0.76.0"
 
 
 def main():
@@ -9,7 +9,7 @@ def main():
         task(
             name="Build librusty_v8.a",
             alias="rustyv8",
-            instance=container("rust:latest", cpu=8, memory="16G", greedy=True),
+            instance=container("rust:latest", cpu=8, memory="16G"),
             env={
                 "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
                 "HOST": "x86_64-unknown-linux-gnu",
@@ -49,9 +49,9 @@ def main():
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
             instructions=[
-                script("build",
+                script("prepare",
                     'echo "deb https://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list',
-                    'curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc "https://apt.llvm.org/llvm-snapshot.gpg.key"',
+                    'curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key',
                     'apt-get update -qq',
                     'apt-get install -qy --no-install-recommends clang-${LLVM_VERSION} libc++1-${LLVM_VERSION} libclang-rt-${LLVM_VERSION}-dev lld-${LLVM_VERSION} llvm-${LLVM_VERSION}',
 
@@ -67,7 +67,8 @@ def main():
                     'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
 
                     'install -D config-rusty_v8.toml .cargo/config.toml',
-
+                ),
+                script("build",
                     'cargo +stable -Z unstable-options -C rusty_v8 build --release -vv',
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" librusty_v8.a',
                 ),
@@ -78,7 +79,7 @@ def main():
             name="Build deno",
             alias="deno",
             depends_on=["Build librusty_v8.a"],
-            instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="16G", greedy=True),
+            instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="16G"),
             env={
                 "DENO_VERSION": DENO_VERSION,
                 "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
@@ -88,7 +89,7 @@ def main():
                 script("build",
                     'curl -fsSLO "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/librusty_v8-aarch64-android/librusty_v8.a"',
 
-                    'git clone --filter=tree:0 --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
+                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
 
                     'patch -d deno -p1 < deno-android.patch',
 
