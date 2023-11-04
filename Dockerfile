@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.37.0"
+ARG DENO_VERSION="v1.38.0"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail | jq -r '"\(.vers): v8 \(.deps[] | select(.name == "v8") | .req)"'
-ARG RUSTY_V8_VERSION="v0.76.0"
+ARG RUSTY_V8_VERSION="v0.81.0"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -22,16 +22,16 @@ FROM --platform=linux/amd64 rust:latest AS build-rusty_v8
 
 ENV HOST="x86_64-unknown-linux-gnu"
 ENV TARGET="aarch64-linux-android"
-ENV LLVM_VERSION="14"
-ENV ANDROID_NDK_VERSION="r25c"
-ENV ANDROID_NDK_MAJOR_VERSION="25"
+ENV LLVM_VERSION="17"
+ENV ANDROID_NDK_VERSION="r26b"
+ENV ANDROID_NDK_MAJOR_VERSION="26"
 ENV ANDROID_API="29"
 ENV ANDROID_NDK="/opt/android-ndk-${ANDROID_NDK_VERSION}"
 ENV ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin"
 ENV ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
 ENV CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
-RUN echo "deb https://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
+RUN echo "deb https://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
  && curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key \
  && apt-get update -qq \
  && apt-get install -qy --no-install-recommends \
@@ -82,7 +82,8 @@ RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
 
 COPY *.patch .
 
-RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch
+RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch \
+ && patch -d rusty_v8 -p1 < rusty_v8-fix-static_assert.patch
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
@@ -103,11 +104,11 @@ RUN apt-get update -qq \
         git \
         make \
         patch \
+        protobuf \
         rust \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
 
 ARG DENO_VERSION
-ARG RUSTY_V8_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
         --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
 

@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.37.0"
-RUSTY_V8_VERSION = "v0.76.0"
+DENO_VERSION = "v1.38.0"
+RUSTY_V8_VERSION = "v0.81.0"
 
 
 def main():
@@ -14,9 +14,9 @@ def main():
                 "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
                 "HOST": "x86_64-unknown-linux-gnu",
                 "TARGET": "aarch64-linux-android",
-                "LLVM_VERSION": "14",
-                "ANDROID_NDK_VERSION": "r25c",
-                "ANDROID_NDK_MAJOR_VERSION": "25",
+                "LLVM_VERSION": "17",
+                "ANDROID_NDK_VERSION": "r26b",
+                "ANDROID_NDK_MAJOR_VERSION": "26",
                 "ANDROID_API": "29",
                 "ANDROID_NDK": "/opt/android-ndk-${ANDROID_NDK_VERSION}",
                 "ANDROID_NDK_BIN": "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin",
@@ -50,7 +50,7 @@ def main():
             },
             instructions=[
                 script("prepare",
-                    'echo "deb https://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list',
+                    'echo "deb https://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list',
                     'curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key',
                     'apt-get update -qq',
                     'apt-get install -qy --no-install-recommends clang-${LLVM_VERSION} libc++1-${LLVM_VERSION} libclang-rt-${LLVM_VERSION}-dev lld-${LLVM_VERSION} llvm-${LLVM_VERSION}',
@@ -65,6 +65,7 @@ def main():
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
                     'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
+                    'patch -d rusty_v8 -p1 < rusty_v8-fix-static_assert.patch',
 
                     'install -D config-rusty_v8.toml .cargo/config.toml',
                 ),
@@ -82,7 +83,6 @@ def main():
             instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="16G"),
             env={
                 "DENO_VERSION": DENO_VERSION,
-                "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
             instructions=[

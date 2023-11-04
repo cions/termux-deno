@@ -19,9 +19,6 @@ rustflags = ["-C", "target-cpu=kryo", "-C", "target-feature=+fp16,+lse", "-C", "
 [target."x86_64-unknown-linux-gnu"]
 rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=lld"]
 
-[registries.crates-io]
-protocol = "sparse"
-
 [env]
 CFLAGS = "--target=aarch64-linux-android29 -O3 -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
 CXXFLAGS = "--target=aarch64-linux-android29 -O3 -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
@@ -44,10 +41,10 @@ target_cpu="arm64" \
 custom_toolchain="//build/toolchain/android:android_clang_arm64" \
 host_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
 v8_snapshot_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
-clang_version="14" \
-android_ndk_root="/opt/android-ndk-r25c" \
-android_ndk_version="r25c" \
-android_ndk_major_version=25 \
+clang_version="17" \
+android_ndk_root="/opt/android-ndk-r26b" \
+android_ndk_version="r26b" \
+android_ndk_major_version=26 \
 android32_ndk_api_level=29 \
 android64_ndk_api_level=29 \
 android_channel="stable" \

@@ -31,5 +31,6 @@ RUN apt-get update -qq \
         git \
         make \
         patch \
+        protobuf \
         rust \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
