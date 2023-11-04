@@ -9,7 +9,7 @@ def main():
         task(
             name="Build librusty_v8.a",
             alias="rustyv8",
-            instance=container("rust:latest", cpu=8, memory="16G"),
+            instance=container("rust:latest", cpu=8, memory="8G"),
             env={
                 "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
                 "HOST": "x86_64-unknown-linux-gnu",
@@ -70,7 +70,7 @@ def main():
                     'install -D config-rusty_v8.toml .cargo/config.toml',
                 ),
                 script("build",
-                    'cargo +stable -Z unstable-options -C rusty_v8 build --release -vv',
+                    'env -C rusty_v8 cargo +stable build --release -vv',
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" librusty_v8.a',
                 ),
                 artifacts("librusty_v8-aarch64-android", "librusty_v8.a"),
@@ -80,7 +80,7 @@ def main():
             name="Build deno",
             alias="deno",
             depends_on=["Build librusty_v8.a"],
-            instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="16G"),
+            instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="8G"),
             env={
                 "DENO_VERSION": DENO_VERSION,
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
@@ -89,14 +89,17 @@ def main():
                 script("build",
                     'curl -fsSLO "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/librusty_v8-aarch64-android/librusty_v8.a"',
 
-                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
-
-                    'patch -d deno -p1 < deno-android.patch',
-
                     'install -D config-deno.toml .cargo/config.toml',
 
-                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" -vv --path deno/cli',
-                    'rm -rf deno && mv "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno" deno',
+                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
+                    'patch -d deno -p1 < deno-android.patch',
+
+                    # 'cargo install --root="${HOME}/cargo-install" -vv --version="${DENO_VERSION#v}" deno',
+                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" -vv --path deno/cli && rm -rf deno',
+
+                    'termux-elf-cleaner "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno"',
+
+                    'mv "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno" deno',
                 ),
                 artifacts("deno-aarch64-android", "deno", type="application/x-executable"),
             ],

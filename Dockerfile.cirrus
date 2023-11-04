@@ -33,4 +33,5 @@ RUN apt-get update -qq \
         patch \
         protobuf \
         rust \
+        termux-elf-cleaner \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"

@@ -87,7 +87,7 @@ RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch \
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
-RUN cargo +stable -Z unstable-options -C rusty_v8 build --release -vv \
+RUN env -C rusty_v8 cargo +stable build --release -vv \
  && mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" /librusty_v8.a
 
 
@@ -106,6 +106,7 @@ RUN apt-get update -qq \
         patch \
         protobuf \
         rust \
+        termux-elf-cleaner \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
 
 ARG DENO_VERSION
@@ -122,6 +123,8 @@ COPY --chown=system config-deno.toml .cargo/config.toml
 
 # RUN cargo install --root="${HOME}/cargo-install" -vv --version="${DENO_VERSION#v}" deno
 RUN cargo install --root="${HOME}/cargo-install" -vv --path deno/cli
+
+RUN termux-elf-cleaner /data/data/com.termux/files/home/cargo-install/bin/deno
 
 
 FROM scratch
