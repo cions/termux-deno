@@ -1,6 +1,6 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.38.0"
+DENO_VERSION = "v1.38.5"
 RUSTY_V8_VERSION = "v0.81.0"
 
 
@@ -70,7 +70,7 @@ def main():
                     'install -D config-rusty_v8.toml .cargo/config.toml',
                 ),
                 script("build",
-                    'env -C rusty_v8 cargo +stable build --release -vv',
+                    'env -C rusty_v8 cargo +stable build --release --locked -vv',
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" librusty_v8.a',
                 ),
                 artifacts("librusty_v8-aarch64-android", "librusty_v8.a"),
@@ -94,8 +94,8 @@ def main():
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
                     'patch -d deno -p1 < deno-android.patch',
 
-                    # 'cargo install --root="${HOME}/cargo-install" -vv --version="${DENO_VERSION#v}" deno',
-                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" -vv --path deno/cli && rm -rf deno',
+                    # 'cargo install --root="${HOME}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno',
+                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --path deno/cli && rm -rf deno',
 
                     'termux-elf-cleaner "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno"',
 

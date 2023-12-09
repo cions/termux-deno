@@ -1,5 +1,5 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.38.0"
+ARG DENO_VERSION="v1.38.5"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail | jq -r '"\(.vers): v8 \(.deps[] | select(.name == "v8") | .req)"'
 ARG RUSTY_V8_VERSION="v0.81.0"
 
@@ -87,7 +87,7 @@ RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch \
 
 COPY config-rusty_v8.toml .cargo/config.toml
 
-RUN env -C rusty_v8 cargo +stable build --release -vv \
+RUN env -C rusty_v8 cargo +stable build --release --locked -vv \
  && mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" /librusty_v8.a
 
 
@@ -121,8 +121,8 @@ RUN patch -d deno -p1 < deno-android.patch
 
 COPY --chown=system config-deno.toml .cargo/config.toml
 
-# RUN cargo install --root="${HOME}/cargo-install" -vv --version="${DENO_VERSION#v}" deno
-RUN cargo install --root="${HOME}/cargo-install" -vv --path deno/cli
+# RUN cargo install --root="${HOME}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
+RUN cargo install --root="${HOME}/cargo-install" --locked -vv --path deno/cli
 
 RUN termux-elf-cleaner /data/data/com.termux/files/home/cargo-install/bin/deno
 
