@@ -1,6 +1,6 @@
 --- a/cli/build.rs
 +++ b/cli/build.rs
-@@ -442,13 +442,20 @@ fn main() {
+@@ -374,13 +374,20 @@ fn main() {
      panic!("Cross compiling with snapshot is not supported.");
    }
  
@@ -28,7 +28,7 @@
  
    #[cfg(target_os = "windows")]
    println!(
-@@ -481,6 +488,12 @@ fn main() {
+@@ -413,6 +420,12 @@ fn main() {
      }
    }
  
@@ -65,7 +65,7 @@
    let socket_addr = socket2::SockAddr::from(addr);
 --- a/ext/net/ops_tls.rs
 +++ b/ext/net/ops_tls.rs
-@@ -1085,7 +1085,7 @@ where
+@@ -471,7 +471,7 @@ where
    #[cfg(not(windows))]
    socket.set_reuse_address(true)?;
    if args.reuse_port {
@@ -76,7 +76,7 @@
    let socket_addr = socket2::SockAddr::from(bind_addr);
 --- a/ext/node/lib.rs
 +++ b/ext/node/lib.rs
-@@ -117,7 +117,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
+@@ -146,7 +146,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
  #[op2]
  #[string]
  fn op_node_build_os() -> String {
@@ -128,7 +128,7 @@
    {
      let mut info = std::mem::MaybeUninit::uninit();
      // SAFETY: `info` is a valid pointer to a `libc::sysinfo` struct.
-@@ -331,7 +331,7 @@ pub fn mem_info() -> Option<MemInfo> {
+@@ -343,7 +343,7 @@ pub fn mem_info() -> Option<MemInfo> {
  pub fn os_uptime() -> u64 {
    let uptime: u64;
  
