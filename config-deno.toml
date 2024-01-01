@@ -9,7 +9,7 @@ opt-level = 3
 
 [target."aarch64-linux-android"]
 linker = "clang"
-rustflags = ["-C", "target-cpu=kryo", "-C", "target-feature=+fp16,+lse", "-C", "default-linker-libraries=yes"]
+rustflags = ["-C", "target-cpu=cortex-a75", "-C", "target-feature=+aes,+crc,+dotprod,+fp16,+lse,+ras,+rcpc,+rdm,+sha2,+v8.1a,+v8.2a", "-C", "default-linker-libraries=yes"]
 
 [patch.crates-io]
 deno_fs = { path = "deno/ext/fs" }
@@ -27,8 +27,8 @@ CC_aarch64_linux_android = "clang"
 CXX_aarch64_linux_android = "clang++"
 AR_aarch64_linux_android = "llvm-ar"
 NM_aarch64_linux_android = "llvm-nm"
-CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe -Wno-error=implicit-function-declaration"
-CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe -Wno-error=implicit-function-declaration"
+CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -flto=thin -pipe -Wno-error=implicit-function-declaration"
+CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -flto=thin -pipe -Wno-error=implicit-function-declaration"
 CXXSTDLIB = "c++_shared"
 
 RUSTY_V8_ARCHIVE = { value = "librusty_v8.a", relative = true }

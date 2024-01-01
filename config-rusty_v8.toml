@@ -14,22 +14,22 @@ opt-level = 3
 rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=lld"]
 
 [target."aarch64-linux-android"]
-rustflags = ["-C", "target-cpu=kryo", "-C", "target-feature=+fp16,+lse", "-C", "link-arg=-fuse-ld=lld"]
+rustflags = ["-C", "target-cpu=cortex-a75", "-C", "target-feature=+aes,+crc,+dotprod,+fp16,+lse,+ras,+rcpc,+rdm,+sha2,+v8.1a,+v8.2a", "-C", "link-arg=-fuse-ld=lld"]
 
 [target."x86_64-unknown-linux-gnu"]
 rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=lld"]
 
 [env]
-CFLAGS = "--target=aarch64-linux-android29 -O3 -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
-CXXFLAGS = "--target=aarch64-linux-android29 -O3 -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
+CFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -pipe"
+CXXFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -pipe"
 LDFLAGS = "-fuse-ld=lld -Wl,-O2 -Wl,-z,relro -Wl,-z,now -Wl,--as-needed"
 BUILD_CFLAGS = "--target=x86_64-unknown-linux-gnu -O3 -march=native -pipe"
 BUILD_CXXFLAGS = "--target=x86_64-unknown-linux-gnu -O3 -march=native -pipe"
 BUILD_LDFLAGS = "-fuse-ld=lld -Wl,-O2 -Wl,-z,relro -Wl,-z,now -Wl,--as-needed"
-CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
-CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -flto=thin -march=armv8-a+crypto+fp16+lse -mcpu=kryo -pipe"
-CFLAGS_x86_64_unknown_linux_gnu = "--target=x86_64-unknown-linux-gnu -O3 -flto=thin -march=native -pipe"
-CXXFLAGS_x86_64_unknown_linux_gnu = "--target=x86_64-unknown-linux-gnu -O3 -flto=thin -march=native -pipe"
+CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -flto=thin -pipe"
+CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75 -flto=thin -pipe"
+CFLAGS_x86_64_unknown_linux_gnu = "--target=x86_64-unknown-linux-gnu -O3 -march=native -flto=thin -pipe"
+CXXFLAGS_x86_64_unknown_linux_gnu = "--target=x86_64-unknown-linux-gnu -O3 -march=native -flto=thin -pipe"
 CXXSTDLIB = "c++"
 
 V8_FROM_SOURCE = "1"
