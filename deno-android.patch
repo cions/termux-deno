@@ -76,7 +76,7 @@
    let socket_addr = socket2::SockAddr::from(bind_addr);
 --- a/ext/node/lib.rs
 +++ b/ext/node/lib.rs
-@@ -146,7 +146,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
+@@ -160,7 +160,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
  #[op2]
  #[string]
  fn op_node_build_os() -> String {
@@ -88,6 +88,17 @@
  }
  
  #[op2(fast)]
+--- a/ext/node/ops/os/cpus.rs
++++ b/ext/node/ops/os/cpus.rs
+@@ -236,7 +236,7 @@ pub fn cpu_info() -> Option<Vec<CpuInfo>> {
+   }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "android", target_os = "linux"))]
+ pub fn cpu_info() -> Option<Vec<CpuInfo>> {
+   use std::io::BufRead;
+ 
 --- a/runtime/ops/os/mod.rs
 +++ b/runtime/ops/os/mod.rs
 @@ -320,7 +320,7 @@ fn op_runtime_memory_usage(scope: &mut v8::HandleScope) -> MemoryUsage {
