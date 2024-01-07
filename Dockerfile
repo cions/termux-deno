@@ -2,6 +2,8 @@
 ARG DENO_VERSION="v1.39.1"
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail | jq -r '"\(.vers): v8 \(.deps[] | select(.name == "v8") | .req)"'
 ARG RUSTY_V8_VERSION="v0.82.0"
+# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/li/bz/libz-sys | tail | jq '.vers'
+ARG LIBZ_SYS_VERSION="1.1.12"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -112,12 +114,16 @@ RUN apt-get update -qq \
 ARG DENO_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
         --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
+ARG LIBZ_SYS_VERSION
+RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
+        --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" libz-sys
 
 COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
 
 COPY --chown=system *.patch .
 
 RUN patch -d deno -p1 < deno-android.patch
+RUN patch -d libz-sys -p1 < libz-sys-fix-tls-alignment.patch
 
 COPY --chown=system config-deno.toml .cargo/config.toml
 

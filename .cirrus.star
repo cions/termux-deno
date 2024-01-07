@@ -2,6 +2,7 @@ load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", 
 
 DENO_VERSION = "v1.39.1"
 RUSTY_V8_VERSION = "v0.82.0"
+LIBZ_SYS_VERSION = "1.1.12"
 
 
 def main():
@@ -83,6 +84,7 @@ def main():
             instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="8G"),
             env={
                 "DENO_VERSION": DENO_VERSION,
+                "LIBZ_SYS_VERSION": LIBZ_SYS_VERSION,
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
             instructions=[
@@ -92,7 +94,9 @@ def main():
                     'install -D config-deno.toml .cargo/config.toml',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno',
+                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" libz-sys',
                     'patch -d deno -p1 < deno-android.patch',
+                    'patch -d libz-sys -p1 < libz-sys-fix-tls-alignment.patch',
 
                     # 'cargo install --root="${HOME}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno',
                     'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --path deno/cli && rm -rf deno',

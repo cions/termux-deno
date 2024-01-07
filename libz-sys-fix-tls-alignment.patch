@@ -1,0 +1,11 @@
+--- a/src/zlib-ng/zbuild.h
++++ b/src/zlib-ng/zbuild.h
+@@ -34,7 +34,7 @@
+ /* Determine compiler support for TLS */
+ #ifndef Z_TLS
+ #  ifdef HAVE_THREAD_LOCAL
+-#    define Z_TLS _Thread_local
++#    define Z_TLS _Thread_local _Alignas(64)
+ #  elif defined(__GNUC__) || defined(__SUNPRO_C)
+ #    define Z_TLS __thread
+ #  elif defined(_WIN32) && (defined(_MSC_VER) || defined(__ICL))
