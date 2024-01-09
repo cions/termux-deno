@@ -41,6 +41,42 @@
    // To debug snapshot issues uncomment:
    // op_fetch_asset::trace_serializer();
  
+--- a/cli/tsc/dts/lib.deno.ns.d.ts
++++ b/cli/tsc/dts/lib.deno.ns.d.ts
+@@ -4958,6 +4958,7 @@ declare namespace Deno {
+     os:
+       | "darwin"
+       | "linux"
++      | "android"
+       | "windows"
+       | "freebsd"
+       | "netbsd"
+--- a/ext/fs/30_fs.js
++++ b/ext/fs/30_fs.js
+@@ -260,7 +260,7 @@ function createByteStruct(types) {
+   // types can be "date", "bool" or "u64".
+   let offset = 0;
+   let str =
+-    'const unix = Deno.build.os === "darwin" || Deno.build.os === "linux" || Deno.build.os === "openbsd" || Deno.build.os === "freebsd"; return {';
++    'const unix = Deno.build.os === "darwin" || Deno.build.os === "linux" || Deno.build.os === "android" || Deno.build.os === "openbsd" || Deno.build.os === "freebsd"; return {';
+   const typeEntries = ObjectEntries(types);
+   for (let i = 0; i < typeEntries.length; ++i) {
+     let { 0: name, 1: type } = typeEntries[i];
+@@ -325,8 +325,12 @@ const { 0: statStruct, 1: statBuf } = createByteStruct({
+ });
+ 
+ function parseFileInfo(response) {
+-  const unix = core.build.os === "darwin" || core.build.os === "linux" ||
+-    core.build.os === "freebsd" || core.build.os === "openbsd";
++  const unix =
++    core.build.os === "darwin" ||
++    core.build.os === "linux" ||
++    core.build.os === "android" ||
++    core.build.os === "freebsd" ||
++    core.build.os === "openbsd";
+   return {
+     isFile: response.isFile,
+     isDirectory: response.isDirectory,
 --- a/ext/fs/std_fs.rs
 +++ b/ext/fs/std_fs.rs
 @@ -62,7 +62,7 @@ impl FileSystem for RealFs {
@@ -63,6 +99,15 @@
      socket.set_reuse_port(true)?;
    }
    let socket_addr = socket2::SockAddr::from(addr);
+@@ -429,7 +429,7 @@ where
+     // are different from the BSDs: it _shares_ the port rather than steal it
+     // from the current listener. While useful, it's not something we can
+     // emulate on other platforms so we don't enable it.
+-    #[cfg(any(target_os = "windows", target_os = "linux"))]
++    #[cfg(any(target_os = "windows", target_os = "android", target_os = "linux"))]
+     socket_tmp.set_reuse_address(true)?;
+     #[cfg(all(unix, not(target_os = "linux")))]
+     socket_tmp.set_reuse_port(true)?;
 --- a/ext/net/ops_tls.rs
 +++ b/ext/net/ops_tls.rs
 @@ -471,7 +471,7 @@ where
@@ -74,20 +119,6 @@
      socket.set_reuse_port(true)?;
    }
    let socket_addr = socket2::SockAddr::from(bind_addr);
---- a/ext/node/lib.rs
-+++ b/ext/node/lib.rs
-@@ -160,7 +160,10 @@ pub static NODE_ENV_VAR_ALLOWLIST: Lazy<HashSet<String>> = Lazy::new(|| {
- #[op2]
- #[string]
- fn op_node_build_os() -> String {
--  env!("TARGET").split('-').nth(2).unwrap().to_string()
-+  match env!("TARGET") {
-+    "aarch64-linux-android" => "linux".to_string(),
-+    target => target.split('-').nth(2).unwrap().to_string(),
-+  }
- }
- 
- #[op2(fast)]
 --- a/ext/node/ops/os/cpus.rs
 +++ b/ext/node/ops/os/cpus.rs
 @@ -236,7 +236,7 @@ pub fn cpu_info() -> Option<Vec<CpuInfo>> {
@@ -99,6 +130,78 @@
  pub fn cpu_info() -> Option<Vec<CpuInfo>> {
    use std::io::BufRead;
  
+--- a/ext/node/polyfills/_util/os.ts
++++ b/ext/node/polyfills/_util/os.ts
+@@ -3,9 +3,9 @@
+ import { core } from "ext:core/mod.js";
+ const ops = core.ops;
+ 
+-export type OSType = "windows" | "linux" | "darwin" | "freebsd" | "openbsd";
++export type OSType = "windows" | "linux" | "android" | "darwin" | "freebsd" | "openbsd";
+ 
+ export const osType: OSType = ops.op_node_build_os();
+ 
+ export const isWindows = osType === "windows";
+-export const isLinux = osType === "linux";
++export const isLinux = osType === "linux" || osType === "android";
+--- a/ext/node/polyfills/internal_binding/constants.ts
++++ b/ext/node/polyfills/internal_binding/constants.ts
+@@ -330,7 +330,7 @@ if (buildOs === "darwin") {
+       PRIORITY_HIGHEST: -20,
+     },
+   };
+-} else if (buildOs === "linux") {
++} else if (buildOs === "linux" || buildOs === "android") {
+   os = {
+     UV_UDP_REUSEADDR: 4,
+     dlopen: {
+--- a/ext/node/polyfills/internal_binding/uv.ts
++++ b/ext/node/polyfills/internal_binding/uv.ts
+@@ -494,6 +494,8 @@ export const errorMap = new Map<number, [string, string]>(
+     ? codeToErrorDarwin
+     : osType === "linux"
+     ? codeToErrorLinux
++    : osType === "android"
++    ? codeToErrorLinux
+     : osType === "freebsd"
+     ? codeToErrorFreebsd
+     : osType === "openbsd"
+@@ -508,6 +510,8 @@ export const codeMap = new Map<string, number>(
+     ? errorToCodeDarwin
+     : osType === "linux"
+     ? errorToCodeLinux
++    : osType === "android"
++    ? errorToCodeLinux
+     : osType === "freebsd"
+     ? errorToCodeFreebsd
+     : osType === "openbsd"
+--- a/ext/node/polyfills/os.ts
++++ b/ext/node/polyfills/os.ts
+@@ -151,7 +151,7 @@ export function endianness(): "BE" | "LE" {
+ 
+ /** Return free memory amount */
+ export function freemem(): number {
+-  if (Deno.build.os === "linux") {
++  if (Deno.build.os === "linux" || Deno.build.os == "android") {
+     // On linux, use 'available' memory
+     // https://github.com/libuv/libuv/blob/a5c01d4de3695e9d9da34cfd643b5ff0ba582ea7/src/unix/linux.c#L2064
+     return Deno.systemMemoryInfo().available;
+@@ -176,6 +176,7 @@ export function homedir(): string | null {
+     case "windows":
+       return Deno.env.get("USERPROFILE") || null;
+     case "linux":
++    case "android":
+     case "darwin":
+     case "freebsd":
+     case "openbsd":
+@@ -310,6 +311,7 @@ export function type(): string {
+     case "windows":
+       return "Windows_NT";
+     case "linux":
++    case "android":
+       return "Linux";
+     case "darwin":
+       return "Darwin";
 --- a/runtime/ops/os/mod.rs
 +++ b/runtime/ops/os/mod.rs
 @@ -320,7 +320,7 @@ fn op_runtime_memory_usage(scope: &mut v8::HandleScope) -> MemoryUsage {
@@ -121,16 +224,30 @@
    {
      use libc::SI_LOAD_SHIFT;
  
-@@ -46,7 +46,7 @@ pub fn loadavg() -> LoadAvg {
- }
- 
- pub fn os_release() -> String {
--  #[cfg(target_os = "linux")]
-+  #[cfg(any(target_os = "android", target_os = "linux"))]
-   {
-     #[allow(clippy::disallowed_methods)]
-     match std::fs::read_to_string("/proc/sys/kernel/osrelease") {
-@@ -198,7 +198,7 @@ pub fn mem_info() -> Option<MemInfo> {
+@@ -57,6 +57,22 @@ pub fn os_release() -> String {
+       _ => String::from(""),
+     }
+   }
++  #[cfg(target_os = "android")]
++  {
++    let mut info = std::mem::MaybeUninit::uninit();
++    // SAFETY: `info` is a valid pointer to a `libc::utsname` struct.
++    let res = unsafe { libc::uname(info.as_mut_ptr()) };
++    if res != 0 {
++      return String::from("");
++    }
++    // SAFETY: `uname` returns 0 on success, and `info` is initialized.
++    let mut info = unsafe { info.assume_init() };
++    let len = info.release.len();
++    info.release[len - 1] = 0;
++    // SAFETY: `info.release` is a valid pointer and NUL-terminated.
++    let c_str = unsafe { std::ffi::CStr::from_ptr(info.release.as_ptr()) };
++    c_str.to_string_lossy().into_owned()
++  }
+   #[cfg(any(
+     target_vendor = "apple",
+     target_os = "freebsd",
+@@ -198,7 +214,7 @@ pub fn mem_info() -> Option<MemInfo> {
      swap_total: 0,
      swap_free: 0,
    };
@@ -139,7 +256,7 @@
    {
      let mut info = std::mem::MaybeUninit::uninit();
      // SAFETY: `info` is a valid pointer to a `libc::sysinfo` struct.
-@@ -343,7 +343,7 @@ pub fn mem_info() -> Option<MemInfo> {
+@@ -343,7 +359,7 @@ pub fn mem_info() -> Option<MemInfo> {
  pub fn os_uptime() -> u64 {
    let uptime: u64;
  
