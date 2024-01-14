@@ -12,11 +12,7 @@ linker = "clang"
 rustflags = ["-C", "target-cpu=cortex-a75", "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2", "-C", "default-linker-libraries=yes"]
 
 [patch.crates-io]
-libz-sys = { path = "libz-sys" }
-deno_fs = { path = "deno/ext/fs" }
-deno_net = { path = "deno/ext/net" }
-deno_node = { path = "deno/ext/node" }
-deno_runtime = { path = "deno/runtime" }
+libz-sys = { path = "/data/data/com.termux/files/usr/tmp/libz-sys" }
 
 [env]
 CC = "clang"
@@ -32,5 +28,5 @@ CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=corte
 CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -pipe -Wno-error=implicit-function-declaration"
 CXXSTDLIB = "c++_shared"
 
-RUSTY_V8_ARCHIVE = { value = "librusty_v8.a", relative = true }
+RUSTY_V8_ARCHIVE = "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
 GN_ARGS = "use_custom_libcxx=false"

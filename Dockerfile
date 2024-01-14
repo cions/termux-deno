@@ -1,8 +1,8 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.39.2"
-# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno_core | tail | jq -r '"\(.vers): v8 \(.deps[] | select(.name == "v8") | .req)"'
+ARG DENO_VERSION="v1.39.3"
+# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
 ARG RUSTY_V8_VERSION="v0.82.0"
-# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/li/bz/libz-sys | tail | jq '.vers'
+# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "libz-sys"'
 ARG LIBZ_SYS_VERSION="1.1.12"
 
 
@@ -22,16 +22,16 @@ RUN go run /resolve.go \
 
 FROM --platform=linux/amd64 rust:latest AS build-rusty_v8
 
-ENV HOST="x86_64-unknown-linux-gnu"
-ENV TARGET="aarch64-linux-android"
-ENV LLVM_VERSION="17"
-ENV ANDROID_NDK_VERSION="r26b"
-ENV ANDROID_NDK_MAJOR_VERSION="26"
-ENV ANDROID_API="29"
+ENV HOST="x86_64-unknown-linux-gnu" \
+    TARGET="aarch64-linux-android" \
+    LLVM_VERSION="17" \
+    ANDROID_NDK_VERSION="r26b" \
+    ANDROID_NDK_MAJOR_VERSION="26" \
+    ANDROID_API="29"
 ENV ANDROID_NDK="/opt/android-ndk-${ANDROID_NDK_VERSION}"
-ENV ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin"
-ENV ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-ENV CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
+ENV ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin" \
+    ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot" \
+    CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
 RUN echo "deb https://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
  && curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key \
@@ -111,28 +111,25 @@ RUN apt-get update -qq \
         termux-elf-cleaner \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
 
-ARG DENO_VERSION
-RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" deno
 ARG LIBZ_SYS_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" libz-sys
+        --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" \
+        /data/data/com.termux/files/usr/tmp/libz-sys
 
-COPY --from=build-rusty_v8 --chown=system /librusty_v8.a .
+COPY --from=build-rusty_v8 --chown=system /librusty_v8.a /data/data/com.termux/files/usr/tmp/librusty_v8.a
 
 COPY --chown=system *.patch .
 
-RUN patch -d deno -p1 < deno-android.patch
-RUN patch -d libz-sys -p1 < libz-sys-fix-tls-alignment.patch
+RUN patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch
 
-COPY --chown=system config-deno.toml .cargo/config.toml
+COPY --chown=system config-deno.toml /data/data/com.termux/files/.cargo/config.toml
 
-# RUN cargo install --root="${HOME}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
-RUN cargo install --root="${HOME}/cargo-install" --locked -vv --path deno/cli
+ARG DENO_VERSION
+RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
 
-RUN termux-elf-cleaner /data/data/com.termux/files/home/cargo-install/bin/deno
+RUN termux-elf-cleaner /data/data/com.termux/files/usr/tmp/cargo-install/bin/deno
 
 
 FROM scratch
 
-COPY --from=build-deno /data/data/com.termux/files/home/cargo-install/bin/deno /
+COPY --from=build-deno /data/data/com.termux/files/usr/tmp/cargo-install/bin/deno /
