@@ -1,5 +1,5 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.39.3"
+ARG DENO_VERSION="v1.39.4"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
 ARG RUSTY_V8_VERSION="v0.82.0"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "libz-sys"'
