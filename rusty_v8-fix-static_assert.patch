@@ -1,6 +1,6 @@
 --- a/v8/src/handles/handles.h
 +++ b/v8/src/handles/handles.h
-@@ -123,22 +123,11 @@ class Handle final : public HandleBase {
+@@ -133,22 +133,10 @@ class Handle final : public HandleBase {
    // This means that this is only permitted for Tagged<T> with an operator->,
    // i.e. for on-heap object T.
    V8_INLINE Tagged<T> operator->() const {
@@ -23,17 +23,15 @@
 +    static_assert(
 +        is_subtype_v<T, HeapObject>,
 +        "This handle does not reference a heap object. Use `(*handle).foo`.");
-+
 +    return **this;
    }
  
    V8_INLINE Tagged<T> operator*() const {
-@@ -409,19 +398,11 @@ class DirectHandle final : public DirectHandleBase {
+@@ -430,18 +418,10 @@ class DirectHandle final : public DirectHandleBase {
                                                    : kTaggedNullAddress) {}
  
    V8_INLINE Tagged<T> operator->() const {
--    if constexpr (std::is_base_of_v<HeapObject, T> ||
--                  std::is_convertible_v<T*, HeapObject*>) {
+-    if constexpr (is_subtype_v<T, HeapObject>) {
 -      return **this;
 -    } else {
 -      // For non-HeapObjects, there's no on-heap object to dereference, so
@@ -46,9 +44,8 @@
 -          "This handle does not reference a heap object. Use `(*handle).foo`.");
 -    }
 +    static_assert(
-+      std::is_base_of_v<HeapObject, T> || std::is_convertible_v<T*, HeapObject*>,
-+      "This handle does not reference a heap object. Use `(*handle).foo`.");
-+
++        is_subtype_v<T, HeapObject>,
++        "This handle does not reference a heap object. Use `(*handle).foo`.");
 +    return **this;
    }
  

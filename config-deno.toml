@@ -9,9 +9,15 @@ opt-level = 3
 
 [target."aarch64-linux-android"]
 linker = "clang"
-rustflags = ["-C", "target-cpu=cortex-a75", "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2", "-C", "default-linker-libraries=yes"]
+rustflags = [
+    "-C", "target-cpu=cortex-a75",
+    "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+    "-C", "default-linker-libraries=yes",
+    "-C", "link-arg=-Wl,--as-needed,/data/data/com.termux/files/usr/lib/libandroid.so,--no-as-needed",
+]
 
 [patch.crates-io]
+deno_webgpu = { path = "/data/data/com.termux/files/usr/tmp/deno/ext/webgpu" }
 libz-sys = { path = "/data/data/com.termux/files/usr/tmp/libz-sys" }
 
 [env]

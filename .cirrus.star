@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.39.4"
-RUSTY_V8_VERSION = "v0.82.0"
+DENO_VERSION = "v1.40.1"
+RUSTY_V8_VERSION = "v0.83.1"
 LIBZ_SYS_VERSION = "1.1.12"
 
 
@@ -63,6 +63,7 @@ def main():
                     'curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip"',
                     'unzip -q -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip"',
                     'ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"',
+                    'cp "${ANDROID_NDK_SYSROOT}/usr/lib/${TARGET}/${ANDROID_API}/libandroid.so" "${CIRRUS_WORKING_DIR}/libandroid.so"',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8',
                     'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
@@ -75,6 +76,7 @@ def main():
                     'mv "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" "${CIRRUS_WORKING_DIR}/librusty_v8.a"',
                 ),
                 artifacts("librusty_v8-aarch64-android", "librusty_v8.a"),
+                artifacts("libandroid-aarch64-android", "libandroid.so"),
             ],
         ),
         task(
@@ -85,18 +87,24 @@ def main():
             env={
                 "DENO_VERSION": DENO_VERSION,
                 "LIBZ_SYS_VERSION": LIBZ_SYS_VERSION,
+                "LD_LIBRARY_PATH": "/data/data/com.termux/files/usr/lib",
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
             instructions=[
                 script("build",
                     'curl -fsSL -o /data/data/com.termux/files/usr/tmp/librusty_v8.a "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/librusty_v8-aarch64-android/librusty_v8.a"',
+                    'curl -fsSL -o /data/data/com.termux/files/usr/lib/libandroid.so "https://api.cirrus-ci.com/v1/artifact/build/${CIRRUS_BUILD_ID}/rustyv8/libandroid-aarch64-android/libandroid.so"',
 
                     'install -D config-deno.toml /data/data/com.termux/files/.cargo/config.toml',
+
+                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" /data/data/com.termux/files/usr/tmp/deno',
+                    'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-webgpu-fix-android.patch',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" /data/data/com.termux/files/usr/tmp/libz-sys',
                     'patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch',
 
-                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno',
+                    'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli',
+                    # 'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno',
 
                     'termux-elf-cleaner "${CIRRUS_WORKING_DIR}/cargo-install/bin/deno"',
 

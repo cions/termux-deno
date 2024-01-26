@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.39.4"
+ARG DENO_VERSION="v1.40.1"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
-ARG RUSTY_V8_VERSION="v0.82.0"
+ARG RUSTY_V8_VERSION="v0.83.1"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "libz-sys"'
 ARG LIBZ_SYS_VERSION="1.1.12"
 
@@ -51,7 +51,8 @@ RUN rustup toolchain install stable \
 RUN curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
  && unzip -q -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
  && rm -rf "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
- && ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"
+ && ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm" \
+ && cp "${ANDROID_NDK_SYSROOT}/usr/lib/${TARGET}/${ANDROID_API}/libandroid.so" /libandroid.so
 
 ENV PATH="/usr/lib/llvm-${LLVM_VERSION}/bin:${PATH}" \
     CC_aarch64_linux_android="${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang" \
@@ -111,21 +112,29 @@ RUN apt-get update -qq \
         termux-elf-cleaner \
  && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
 
+ARG DENO_VERSION
+RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
+        --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" \
+        /data/data/com.termux/files/usr/tmp/deno
 ARG LIBZ_SYS_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
         --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" \
         /data/data/com.termux/files/usr/tmp/libz-sys
 
 COPY --from=build-rusty_v8 --chown=system /librusty_v8.a /data/data/com.termux/files/usr/tmp/librusty_v8.a
+COPY --from=build-rusty_v8 --chown=system /libandroid.so /data/data/com.termux/files/usr/lib/libandroid.so
+ENV LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib"
 
 COPY --chown=system *.patch .
 
+RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-webgpu-fix-android.patch
 RUN patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch
 
 COPY --chown=system config-deno.toml /data/data/com.termux/files/.cargo/config.toml
 
-ARG DENO_VERSION
-RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
+RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli
+# ARG DENO_VERSION
+# RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
 
 RUN termux-elf-cleaner /data/data/com.termux/files/usr/tmp/cargo-install/bin/deno
 
