@@ -1,6 +1,6 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.40.3"
+DENO_VERSION = "v1.40.4"
 RUSTY_V8_VERSION = "v0.83.1"
 LIBZ_SYS_VERSION = "1.1.12"
 
@@ -98,7 +98,7 @@ def main():
                     'install -D config-deno.toml /data/data/com.termux/files/.cargo/config.toml',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" /data/data/com.termux/files/usr/tmp/deno',
-                    'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-webgpu-fix-android.patch',
+                    'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" /data/data/com.termux/files/usr/tmp/libz-sys',
                     'patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch',

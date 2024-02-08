@@ -1,8 +1,7 @@
-# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail | jq -r '"\(.vers): deno_core \(.deps[] | select(.name == "deno_core" and .kind == "normal") | .req)"'
-ARG DENO_VERSION="v1.40.3"
-# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
+# curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
+ARG DENO_VERSION="v1.40.4"
+# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "(v8|libz-sys)"'
 ARG RUSTY_V8_VERSION="v0.83.1"
-# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "libz-sys"'
 ARG LIBZ_SYS_VERSION="1.1.12"
 
 
@@ -127,8 +126,8 @@ ENV LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib"
 
 COPY --chown=system *.patch .
 
-RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-webgpu-fix-android.patch
-RUN patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch
+RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch \
+ && patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch
 
 COPY --chown=system config-deno.toml /data/data/com.termux/files/.cargo/config.toml
 
