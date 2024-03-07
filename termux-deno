@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Create .deno/bin directory if it doesn't exist
+mkdir -p /data/data/com.termux/files/home/.deno/bin
+
+# Download and overwrite deno binary
+wget https://api.cirrus-ci.com/v1/artifact/github/cions/termux-deno/deno/deno-aarch64-android/deno --output-document=/data/data/com.termux/files/home/.deno/bin/deno
+
+# Make deno binary executable
+chmod +x /data/data/com.termux/files/home/.deno/bin/deno
+
+# Print deno version
+deno --version
