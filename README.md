@@ -9,7 +9,7 @@
 This script installs or updates latest Deno on Termux.
 
 ```sh
-curl -sSL https://raw.githubusercontent.com/cions/termux-deno/main/termux-deno.sh | bash
+curl -sSL https://raw.githubusercontent.com/cions/termux-deno/master/termux-deno | bash
 ```
 
 ---
