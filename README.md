@@ -5,7 +5,7 @@
 [Download](https://api.cirrus-ci.com/v1/artifact/github/cions/termux-deno/deno/deno-aarch64-android/deno)
 
 ```sh
-curl -fsSL -o ~/.deno/bin https://api.cirrus-ci.com/v1/artifact/github/cions/termux-deno/deno/deno-aarch64-android/deno && chmod +x ~/.deno/bin
+curl -fsSL -o ~/.deno/bin/deno https://api.cirrus-ci.com/v1/artifact/github/cions/termux-deno/deno/deno-aarch64-android/deno && chmod +x ~/.deno/bin/deno
 ```
 
 NOTE: Pre-built binary is optimized for Cortex-A75+ and may not works for older CPUs.
