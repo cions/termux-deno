@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.41.3"
+ARG DENO_VERSION="v1.42.0"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "(v8|libz-sys)"'
-ARG RUSTY_V8_VERSION="v0.85.0"
+ARG RUSTY_V8_VERSION="v0.89.0"
 ARG LIBZ_SYS_VERSION="1.1.12"
 
 
@@ -99,12 +99,14 @@ COPY --from=resolver /hosts /system/etc/hosts
 
 USER system
 
-RUN apt-get update -qq \
- && apt-get install -qy --no-install-recommends \
+RUN export DEBIAN_FRONTEND="noninteractive" \
+ && apt-get update -qq \
+ && apt-get install -qy --no-install-recommends --option="Dpkg::Options::=--force-confdef" \
         binutils-is-llvm \
         cmake \
         git \
         make \
+        openssl \
         patch \
         protobuf \
         rust \

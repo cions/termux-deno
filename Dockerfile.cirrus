@@ -24,12 +24,14 @@ RUN sed -z -i '/^: $/s/./ /g' /system/bin/linker64
 
 USER system
 
-RUN apt-get update -qq \
- && apt-get install -qy --no-install-recommends \
+RUN export DEBIAN_FRONTEND="noninteractive" \
+ && apt-get update -qq \
+ && apt-get install -qy --no-install-recommends --option="Dpkg::Options::=--force-confdef" \
         binutils-is-llvm \
         cmake \
         git \
         make \
+        openssl \
         patch \
         protobuf \
         rust \
