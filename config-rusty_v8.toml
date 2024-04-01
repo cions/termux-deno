@@ -14,7 +14,11 @@ opt-level = 3
 rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=lld"]
 
 [target."aarch64-linux-android"]
-rustflags = ["-C", "target-cpu=cortex-a75", "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2", "-C", "link-arg=-fuse-ld=lld"]
+rustflags = [
+    "-C", "target-cpu=cortex-a75",
+    "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+    "-C", "link-arg=-fuse-ld=lld",
+]
 
 [target."x86_64-unknown-linux-gnu"]
 rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=lld"]
@@ -42,8 +46,8 @@ custom_toolchain="//build/toolchain/android:android_clang_arm64" \
 host_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
 v8_snapshot_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
 clang_version="17" \
-android_ndk_root="/opt/android-ndk-r26b" \
-android_ndk_version="r26b" \
+android_ndk_root="/opt/android-ndk-r26c" \
+android_ndk_version="r26c" \
 android_ndk_major_version=26 \
 android32_ndk_api_level=29 \
 android64_ndk_api_level=29 \

@@ -1,5 +1,5 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.42.0"
+ARG DENO_VERSION="v1.42.1"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "(v8|libz-sys)"'
 ARG RUSTY_V8_VERSION="v0.89.0"
 ARG LIBZ_SYS_VERSION="1.1.12"
@@ -24,7 +24,7 @@ FROM --platform=linux/amd64 rust:latest AS build-rusty_v8
 ENV HOST="x86_64-unknown-linux-gnu" \
     TARGET="aarch64-linux-android" \
     LLVM_VERSION="17" \
-    ANDROID_NDK_VERSION="r26b" \
+    ANDROID_NDK_VERSION="r26c" \
     ANDROID_NDK_MAJOR_VERSION="26" \
     ANDROID_API="29"
 ENV ANDROID_NDK="/opt/android-ndk-${ANDROID_NDK_VERSION}"
@@ -99,9 +99,8 @@ COPY --from=resolver /hosts /system/etc/hosts
 
 USER system
 
-RUN export DEBIAN_FRONTEND="noninteractive" \
- && apt-get update -qq \
- && apt-get install -qy --no-install-recommends --option="Dpkg::Options::=--force-confdef" \
+RUN apt-get update -qq \
+ && apt-get install -qy -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" --no-install-recommends \
         binutils-is-llvm \
         cmake \
         git \
