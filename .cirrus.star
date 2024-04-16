@@ -1,8 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.42.3"
-RUSTY_V8_VERSION = "v0.89.0"
-LIBZ_SYS_VERSION = "1.1.12"
+DENO_VERSION = "v1.42.4"
+RUSTY_V8_VERSION = "v0.90.1"
 
 
 def main():
@@ -86,7 +85,6 @@ def main():
             instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="8G"),
             env={
                 "DENO_VERSION": DENO_VERSION,
-                "LIBZ_SYS_VERSION": LIBZ_SYS_VERSION,
                 "LD_LIBRARY_PATH": "/data/data/com.termux/files/usr/lib",
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
@@ -99,9 +97,6 @@ def main():
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" /data/data/com.termux/files/usr/tmp/deno',
                     'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch',
-
-                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" /data/data/com.termux/files/usr/tmp/libz-sys',
-                    'patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch',
 
                     'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli',
                     # 'cargo install --root="${CIRRUS_WORKING_DIR}/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno',

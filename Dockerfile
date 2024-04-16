@@ -1,8 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.42.3"
-# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "(v8|libz-sys)"'
-ARG RUSTY_V8_VERSION="v0.89.0"
-ARG LIBZ_SYS_VERSION="1.1.12"
+ARG DENO_VERSION="v1.42.4"
+# curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
+ARG RUSTY_V8_VERSION="v0.90.1"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -116,10 +115,6 @@ ARG DENO_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
         --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" \
         /data/data/com.termux/files/usr/tmp/deno
-ARG LIBZ_SYS_VERSION
-RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${LIBZ_SYS_VERSION}" "https://github.com/rust-lang/libz-sys.git" \
-        /data/data/com.termux/files/usr/tmp/libz-sys
 
 COPY --from=build-rusty_v8 --chown=system /librusty_v8.a /data/data/com.termux/files/usr/tmp/librusty_v8.a
 COPY --from=build-rusty_v8 --chown=system /libandroid.so /data/data/com.termux/files/usr/lib/libandroid.so
@@ -127,8 +122,7 @@ ENV LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib"
 
 COPY --chown=system *.patch .
 
-RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch \
- && patch -d /data/data/com.termux/files/usr/tmp/libz-sys -p1 < libz-sys-fix-tls-alignment.patch
+RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch
 
 COPY --chown=system config-deno.toml /data/data/com.termux/files/.cargo/config.toml
 

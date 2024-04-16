@@ -18,7 +18,6 @@ rustflags = [
 
 [patch.crates-io]
 deno_webgpu = { path = "/data/data/com.termux/files/usr/tmp/deno/ext/webgpu" }
-libz-sys = { path = "/data/data/com.termux/files/usr/tmp/libz-sys" }
 
 [env]
 CC = "clang"
