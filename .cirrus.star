@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.43.2"
-RUSTY_V8_VERSION = "v0.91.0"
+DENO_VERSION = "v1.43.3"
+RUSTY_V8_VERSION = "v0.91.1"
 
 
 def main():
