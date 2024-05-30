@@ -1,6 +1,6 @@
 --- a/v8/src/handles/handles.h
 +++ b/v8/src/handles/handles.h
-@@ -133,22 +133,10 @@ class Handle final : public HandleBase {
+@@ -136,22 +136,10 @@ class Handle final : public HandleBase {
    // This means that this is only permitted for Tagged<T> with an operator->,
    // i.e. for on-heap object T.
    V8_INLINE Tagged<T> operator->() const {
@@ -16,7 +16,7 @@
 -      // If you got an error here and want to access the Tagged<T>, use
 -      // operator* -- e.g. for `Tagged<Smi>::value()`, use `(*handle).value()`.
 -      static_assert(
--          false,
+-          is_subtype_v<T, HeapObject>,
 -          "This handle does not reference a heap object. Use `(*handle).foo`.");
 -#endif
 -    }
@@ -27,7 +27,7 @@
    }
  
    V8_INLINE Tagged<T> operator*() const {
-@@ -430,18 +418,10 @@ class DirectHandle final : public DirectHandleBase {
+@@ -467,18 +455,10 @@ class DirectHandle : public DirectHandleBase {
                                                    : kTaggedNullAddress) {}
  
    V8_INLINE Tagged<T> operator->() const {

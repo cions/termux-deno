@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.43.6"
-RUSTY_V8_VERSION = "v0.91.1"
+DENO_VERSION = "v1.44.0"
+RUSTY_V8_VERSION = "v0.92.0"
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
                 "HOST": "x86_64-unknown-linux-gnu",
                 "TARGET": "aarch64-linux-android",
                 "LLVM_VERSION": "17",
-                "ANDROID_NDK_VERSION": "r26c",
+                "ANDROID_NDK_VERSION": "r26d",
                 "ANDROID_NDK_MAJOR_VERSION": "26",
                 "ANDROID_API": "29",
                 "ANDROID_NDK": "/opt/android-ndk-${ANDROID_NDK_VERSION}",
