@@ -1,7 +1,7 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.44.4"
+ARG DENO_VERSION="v1.45.1"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
-ARG RUSTY_V8_VERSION="v0.93.1"
+ARG RUSTY_V8_VERSION="v0.97.0"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -68,7 +68,8 @@ ENV CC="${CC_aarch64_linux_android}" \
     BUILD_CC="${CC_x86_64_unknown_linux_gnu}" \
     BUILD_CXX="${CXX_x86_64_unknown_linux_gnu}" \
     BUILD_AR="${AR_x86_64_unknown_linux_gnu}" \
-    BUILD_NM="${NM_x86_64_unknown_linux_gnu}"
+    BUILD_NM="${NM_x86_64_unknown_linux_gnu}" \
+    BINDGEN_EXTRA_CLANG_ARGS="--sysroot=${ANDROID_NDK_SYSROOT}"
 ENV __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS="nightly" \
     CARGO_UNSTABLE_HOST_CONFIG="true" \
     CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST="true" \

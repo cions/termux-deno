@@ -1,7 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.44.4"
-RUSTY_V8_VERSION = "v0.93.1"
+DENO_VERSION = "v1.45.1"
+RUSTY_V8_VERSION = "v0.97.0"
 
 
 def main():
@@ -22,6 +22,7 @@ def main():
                 "ANDROID_NDK_BIN": "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin",
                 "ANDROID_NDK_SYSROOT": "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot",
                 "CLANG_BASE_PATH": "${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64",
+                "BINDGEN_EXTRA_CLANG_ARGS": "--sysroot=${ANDROID_NDK_SYSROOT}",
                 "PATH": "/usr/lib/llvm-${LLVM_VERSION}/bin:${PATH}",
                 "CC_aarch64_linux_android": "${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang",
                 "CXX_aarch64_linux_android": "${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang++",
