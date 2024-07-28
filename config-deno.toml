@@ -13,7 +13,6 @@ rustflags = [
     "-C", "target-cpu=cortex-a75",
     "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
     "-C", "default-linker-libraries=yes",
-    "-C", "link-arg=-Wl,--push-state,--as-needed,/data/data/com.termux/files/usr/lib/libandroid.so,--pop-state",
 ]
 
 [patch.crates-io]

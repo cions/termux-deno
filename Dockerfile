@@ -1,14 +1,13 @@
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.45.3"
+ARG DENO_VERSION="v1.45.4"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
-ARG RUSTY_V8_VERSION="v0.98.0"
+ARG RUSTY_V8_VERSION="v0.99.0"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
 
-COPY resolve.go /
-
-RUN go run /resolve.go \
+COPY resolve.go .
+RUN go run resolve.go \
         packages-cf.termux.dev \
         github.com \
         chromium.googlesource.com \
@@ -31,16 +30,22 @@ ENV ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin" \
     ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot" \
     CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
-RUN echo "deb https://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+ && echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/assumeyes \
+ && echo 'APT::Quiet "true";' > /etc/apt/apt.conf.d/quiet \
+ && echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/norecommends \
+ && echo 'APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keepdebs \
+ && echo "deb https://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list \
  && curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key \
- && apt-get update -qq \
- && apt-get install -qy --no-install-recommends \
+ && apt-get update \
+ && apt-get install \
         clang-${LLVM_VERSION} \
         libc++1-${LLVM_VERSION}  \
         libclang-rt-${LLVM_VERSION}-dev \
         lld-${LLVM_VERSION} \
-        llvm-${LLVM_VERSION} \
- && rm -rf /var/lib/apt/lists/*
+        llvm-${LLVM_VERSION}
 
 RUN rustup toolchain install stable \
  && rustup default stable \
@@ -48,9 +53,7 @@ RUN rustup toolchain install stable \
 
 RUN curl -fsSLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
  && unzip -q -d /opt "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
- && rm -rf "android-ndk-${ANDROID_NDK_VERSION}-linux.zip" \
- && ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm" \
- && cp "${ANDROID_NDK_SYSROOT}/usr/lib/${TARGET}/${ANDROID_API}/libandroid.so" /libandroid.so
+ && ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"
 
 ENV PATH="/usr/lib/llvm-${LLVM_VERSION}/bin:${PATH}" \
     CC_aarch64_linux_android="${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang" \
@@ -80,10 +83,9 @@ ENV __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS="nightly" \
 
 ARG RUSTY_V8_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${RUSTY_V8_VERSION}" "https://github.com/denoland/rusty_v8.git" rusty_v8
+        --branch="${RUSTY_V8_VERSION}" https://github.com/denoland/rusty_v8.git rusty_v8
 
 COPY *.patch .
-
 RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch \
  && patch -d rusty_v8 -p1 < rusty_v8-fix-static_assert.patch
 
@@ -99,41 +101,53 @@ COPY --from=resolver /hosts /system/etc/hosts
 
 USER system
 
-RUN apt-get update -qq \
- && apt-get install -qy -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" --no-install-recommends \
+RUN --mount=type=cache,target=/data/data/com.termux/files/usr/var/lib/apt,uid=1000,gid=1000,sharing=locked \
+    --mount=type=cache,target=/data/data/com.termux/cache/apt,uid=1000,gid=1000,sharing=locked \
+    echo 'APT::Get::Assume-Yes "true";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/assumeyes \
+ && echo 'APT::Quiet "true";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/quiet \
+ && echo 'APT::Install-Recommends "false";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/norecommends \
+ && echo 'APT::Keep-Downloaded-Packages "true";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/keepdebs \
+ && echo 'DPkg::Options { "--force-confdef"; "--force-confold"; };' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/confold \
+ && apt-get update \
+ && apt-get install \
         binutils-is-llvm \
         cmake \
         git \
+        libandroid-stub \
         make \
         openssl \
         patch \
         protobuf \
         rust \
         termux-elf-cleaner \
- && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
+ && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm
+
+ENV CARGO_BUILD_TARGET_DIR="/data/data/com.termux/files/home/cargo-build" \
+    CARGO_INSTALL_ROOT="/data/data/com.termux/files/home/cargo-install"
+
+COPY --from=build-rusty_v8 --chown=system /librusty_v8.a /data/data/com.termux/files/usr/tmp/librusty_v8.a
+
+COPY --chown=system config-deno.toml /data/data/com.termux/files/home/.cargo/config.toml
 
 ARG DENO_VERSION
 RUN git clone --depth=1 --recurse-submodules --shallow-submodules \
-        --branch="${DENO_VERSION}" "https://github.com/denoland/deno.git" \
-        /data/data/com.termux/files/usr/tmp/deno
-
-COPY --from=build-rusty_v8 --chown=system /librusty_v8.a /data/data/com.termux/files/usr/tmp/librusty_v8.a
-COPY --from=build-rusty_v8 --chown=system /libandroid.so /data/data/com.termux/files/usr/lib/libandroid.so
-ENV LD_LIBRARY_PATH="/data/data/com.termux/files/usr/lib"
+        --branch="${DENO_VERSION}" https://github.com/denoland/deno.git /data/data/com.termux/files/usr/tmp/deno
 
 COPY --chown=system *.patch .
-
 RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch
 
-COPY --chown=system config-deno.toml /data/data/com.termux/files/.cargo/config.toml
+RUN --mount=type=cache,target=/data/data/com.termux/files/home/.cargo/registry,uid=1000,gid=1000,sharing=locked \
+    --mount=type=cache,target=${CARGO_BUILD_TARGET_DIR},uid=1000,gid=1000,sharing=locked \
+    cargo install --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli
 
-RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli
 # ARG DENO_VERSION
-# RUN cargo install --root="/data/data/com.termux/files/usr/tmp/cargo-install" --locked -vv --version="${DENO_VERSION#v}" deno
+# RUN --mount=type=cache,target=/data/data/com.termux/files/home/.cargo/registry,uid=1000,gid=1000,sharing=locked \
+#     --mount=type=cache,target=${CARGO_BUILD_TARGET_DIR},uid=1000,gid=1000,sharing=locked \
+#     cargo install --locked -vv --version="${DENO_VERSION#v}" deno
 
-RUN termux-elf-cleaner /data/data/com.termux/files/usr/tmp/cargo-install/bin/deno
+RUN termux-elf-cleaner /data/data/com.termux/files/home/cargo-install/bin/deno
 
 
 FROM scratch
 
-COPY --from=build-deno /data/data/com.termux/files/usr/tmp/cargo-install/bin/deno /
+COPY --from=build-deno /data/data/com.termux/files/home/cargo-install/bin/deno /

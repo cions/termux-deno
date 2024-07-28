@@ -1,8 +1,7 @@
 FROM --platform=linux/arm64 golang:latest AS resolver
 
-COPY resolve.go /
-
-RUN go run /resolve.go \
+RUN --mount=type=bind,target=/work \
+    go run /work/resolve.go \
         api.cirrus-ci.com \
         packages-cf.termux.dev \
         github.com \
@@ -17,22 +16,27 @@ FROM --platform=linux/arm64 termux/termux-docker:aarch64
 
 COPY --from=resolver /hosts /system/etc/hosts
 
-RUN sed -z -i '/Warning: "%s" unused DT entry: %s (type %p arg %p) (ignoring)/s/./\x00/g' /system/bin/linker64
-RUN sed -z -i '/WARNING: linker: /{s/./\x00/g;n;s/./ /g}' /system/bin/linker64
-RUN sed -z -i '/^linker$/s/./\x00/g' /system/bin/linker64
-RUN sed -z -i '/^: $/s/./ /g' /system/bin/linker64
+RUN sed -z -i '/Warning: "%s" unused DT entry: %s (type %p arg %p) (ignoring)/s/./\x00/g' /system/bin/linker64 \
+ && sed -z -i '/WARNING: linker: /{s/./\x00/g;n;s/./ /g}' /system/bin/linker64 \
+ && sed -z -i '/^linker$/s/./\x00/g' /system/bin/linker64 \
+ && sed -z -i '/^: $/s/./ /g' /system/bin/linker64
 
 USER system
 
-RUN apt-get update -qq \
- && apt-get install -qy -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" --no-install-recommends \
+RUN echo 'APT::Get::Assume-Yes "true";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/assumeyes \
+ && echo 'APT::Quiet "true";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/quiet \
+ && echo 'APT::Install-Recommends "false";' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/norecommends \
+ && echo 'DPkg::Options { "--force-confdef"; "--force-confold"; };' > /data/data/com.termux/files/usr/etc/apt/apt.conf.d/confold \
+ && apt-get update \
+ && apt-get install \
         binutils-is-llvm \
         cmake \
         git \
+        libandroid-stub \
         make \
         openssl \
         patch \
         protobuf \
         rust \
         termux-elf-cleaner \
- && ln -sf "aarch64-linux-android/asm" "${PREFIX}/include/asm"
+ && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm

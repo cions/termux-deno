@@ -14,5 +14,5 @@ NOTE: Pre-built binary is optimized for Cortex-A75+ and may not works for older 
 
 ```sh
 docker run --privileged --rm multiarch/qemu-user-static --reset -p yes
-docker build --output=type=local,dest=artifacts --progress=plain .
+docker buildx build --output=type=local,dest=artifacts --progress=plain .
 ```
