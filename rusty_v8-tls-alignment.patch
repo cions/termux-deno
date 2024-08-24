@@ -1,0 +1,296 @@
+--- a/v8/src/base/contextual.h
++++ b/v8/src/base/contextual.h
+@@ -69,7 +69,7 @@ class V8_EXPORT_PRIVATE ContextualVariable {
+   static bool HasScope() { return Top() != nullptr; }
+ 
+  private:
+-  inline static thread_local Scope* top_ = nullptr;
++  inline static thread_local _Alignas(64) Scope* top_ = nullptr;
+ 
+ #if defined(USING_V8_SHARED)
+   // Hide the access to `top_` from other DLLs/libraries, since access to
+@@ -118,7 +118,7 @@ class V8_EXPORT_PRIVATE ContextualVariableWithDefault
+ 
+  private:
+   using Base = ContextualVariable<Derived, VarType>;
+-  inline static thread_local VarType default_value_{default_args...};
++  inline static thread_local _Alignas(64) VarType default_value_{default_args...};
+ };
+ 
+ // Usage: DECLARE_CONTEXTUAL_VARIABLE_WITH_DEFAULT(VarName, VarType, Args...)
+--- a/v8/src/base/platform/mutex.cc
++++ b/v8/src/base/platform/mutex.cc
+@@ -27,9 +27,9 @@ namespace {
+ // thread. If this thread has only one held shared mutex (common case), we use
+ // {single_held_shared_mutex}. If it has more than one we allocate a set for it.
+ // Said set has to manually be constructed and destroyed.
+-thread_local base::SharedMutex* single_held_shared_mutex = nullptr;
++thread_local _Alignas(64) base::SharedMutex* single_held_shared_mutex = nullptr;
+ using TSet = std::unordered_set<base::SharedMutex*>;
+-thread_local TSet* held_shared_mutexes = nullptr;
++thread_local _Alignas(64) TSet* held_shared_mutexes = nullptr;
+ 
+ // Returns true iff {shared_mutex} is not a held mutex.
+ bool SharedMutexNotHeld(SharedMutex* shared_mutex) {
+--- a/v8/src/base/platform/platform.cc
++++ b/v8/src/base/platform/platform.cc
+@@ -10,7 +10,7 @@ namespace base {
+ namespace {
+ 
+ // A pointer to current thread's stack beginning.
+-thread_local void* thread_stack_start = nullptr;
++thread_local _Alignas(64) void* thread_stack_start = nullptr;
+ 
+ }  // namespace
+ 
+--- a/v8/src/codegen/assembler.cc
++++ b/v8/src/codegen/assembler.cc
+@@ -132,11 +132,11 @@ class ExternalAssemblerBufferImpl : public AssemblerBuffer {
+   const int size_;
+ };
+ 
+-static thread_local std::aligned_storage_t<sizeof(ExternalAssemblerBufferImpl),
++static thread_local _Alignas(64) std::aligned_storage_t<sizeof(ExternalAssemblerBufferImpl),
+                                            alignof(ExternalAssemblerBufferImpl)>
+     tls_singleton_storage;
+ 
+-static thread_local bool tls_singleton_taken{false};
++static thread_local _Alignas(64) bool tls_singleton_taken{false};
+ 
+ void* ExternalAssemblerBufferImpl::operator new(std::size_t count) {
+   DCHECK_EQ(count, sizeof(ExternalAssemblerBufferImpl));
+--- a/v8/src/common/assert-scope.cc
++++ b/v8/src/common/assert-scope.cc
+@@ -24,7 +24,7 @@ constexpr PerThreadAsserts kClearedValue = PerThreadAsserts{};
+ static_assert(!kClearedValue.contains(ASSERT_TYPE_IS_VALID_MARKER));
+ 
+ // Thread-local storage for assert data.
+-thread_local PerThreadAsserts current_per_thread_assert_data(kInitialValue);
++thread_local _Alignas(64) PerThreadAsserts current_per_thread_assert_data(kInitialValue);
+ 
+ }  // namespace
+ 
+--- a/v8/src/common/ptr-compr.cc
++++ b/v8/src/common/ptr-compr.cc
+@@ -11,7 +11,7 @@ namespace v8::internal {
+ #ifdef V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+ #define THREAD_LOCAL_IF_MULTICAGE
+ #else
+-#define THREAD_LOCAL_IF_MULTICAGE thread_local
++#define THREAD_LOCAL_IF_MULTICAGE thread_local _Alignas(64)
+ #endif  // V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+ 
+ THREAD_LOCAL_IF_MULTICAGE uintptr_t MainCage::base_ = kNullAddress;
+--- a/v8/src/common/ptr-compr.h
++++ b/v8/src/common/ptr-compr.h
+@@ -66,7 +66,7 @@ class MainCage : public AllStatic {
+ #ifdef V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+   static V8_EXPORT_PRIVATE uintptr_t base_ V8_CONSTINIT;
+ #else
+-  static thread_local uintptr_t base_ V8_CONSTINIT;
++  static thread_local _Alignas(64) uintptr_t base_ V8_CONSTINIT;
+ #endif  // V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+ };
+ using V8HeapCompressionScheme = V8HeapCompressionSchemeImpl<MainCage>;
+@@ -160,7 +160,7 @@ class ExternalCodeCompressionScheme {
+ #ifdef V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+   static V8_EXPORT_PRIVATE uintptr_t base_ V8_CONSTINIT;
+ #else
+-  static thread_local uintptr_t base_ V8_CONSTINIT;
++  static thread_local _Alignas(64) uintptr_t base_ V8_CONSTINIT;
+ #endif  // V8_COMPRESS_POINTERS_IN_SHARED_CAGE
+ };
+ 
+--- a/v8/src/compiler/js-heap-broker.cc
++++ b/v8/src/compiler/js-heap-broker.cc
+@@ -65,7 +65,7 @@ std::string JSHeapBroker::Trace() const {
+ }
+ 
+ #ifdef DEBUG
+-static thread_local JSHeapBroker* current_broker = nullptr;
++static thread_local _Alignas(64) JSHeapBroker* current_broker = nullptr;
+ 
+ CurrentHeapBrokerScope::CurrentHeapBrokerScope(JSHeapBroker* broker)
+     : prev_broker_(current_broker) {
+--- a/v8/src/d8/d8-test.cc
++++ b/v8/src/d8/d8-test.cc
+@@ -1400,7 +1400,7 @@ class FastCApiObject {
+ 
+ // The object is statically initialized for simplicity, typically the embedder
+ // will take care of managing their C++ objects lifetime.
+-thread_local FastCApiObject kFastCApiObject;
++thread_local _Alignas(64) FastCApiObject kFastCApiObject;
+ }  // namespace
+ 
+ // static
+--- a/v8/src/d8/d8.cc
++++ b/v8/src/d8/d8.cc
+@@ -125,7 +125,7 @@ namespace v8 {
+ namespace {
+ 
+ // Set on worker threads to the current Worker instance.
+-thread_local Worker* current_worker_ = nullptr;
++thread_local _Alignas(64) Worker* current_worker_ = nullptr;
+ 
+ #ifdef V8_FUZZILLI
+ bool fuzzilli_reprl = true;
+--- a/v8/src/execution/isolate.cc
++++ b/v8/src/execution/isolate.cc
+@@ -506,9 +506,9 @@ size_t Isolate::HashIsolateForEmbeddedBlob() {
+ 
+ Isolate* Isolate::process_wide_shared_space_isolate_{nullptr};
+ 
+-thread_local Isolate::PerIsolateThreadData* g_current_per_isolate_thread_data_
++thread_local _Alignas(64) Isolate::PerIsolateThreadData* g_current_per_isolate_thread_data_
+     V8_CONSTINIT = nullptr;
+-thread_local Isolate* g_current_isolate_ V8_CONSTINIT = nullptr;
++thread_local _Alignas(64) Isolate* g_current_isolate_ V8_CONSTINIT = nullptr;
+ 
+ namespace {
+ // A global counter for all generated Isolates, might overflow.
+--- a/v8/src/execution/isolate.h
++++ b/v8/src/execution/isolate.h
+@@ -2769,9 +2769,9 @@ class V8_EXPORT_PRIVATE Isolate final : private HiddenFactory {
+ // These are outside the Isolate class with extern storage because in clang-cl,
+ // thread_local is incompatible with dllexport linkage caused by
+ // V8_EXPORT_PRIVATE being applied to Isolate.
+-extern thread_local Isolate::PerIsolateThreadData*
++extern thread_local _Alignas(64) Isolate::PerIsolateThreadData*
+     g_current_per_isolate_thread_data_ V8_CONSTINIT;
+-extern thread_local Isolate* g_current_isolate_ V8_CONSTINIT;
++extern thread_local _Alignas(64) Isolate* g_current_isolate_ V8_CONSTINIT;
+ 
+ #undef FIELD_ACCESSOR
+ #undef THREAD_LOCAL_TOP_ACCESSOR
+--- a/v8/src/execution/thread-id.cc
++++ b/v8/src/execution/thread-id.cc
+@@ -11,7 +11,7 @@ namespace internal {
+ 
+ namespace {
+ 
+-thread_local int thread_id = 0;
++thread_local _Alignas(64) int thread_id = 0;
+ 
+ std::atomic<int> next_thread_id{1};
+ 
+--- a/v8/src/handles/handles.h
++++ b/v8/src/handles/handles.h
+@@ -426,7 +426,7 @@ class V8_TRIVIAL_ABI DirectHandleBase :
+   }
+ 
+ #ifdef DEBUG
+-  inline static thread_local int number_of_handles_ = 0;
++  inline static thread_local _Alignas(64) int number_of_handles_ = 0;
+ #endif
+ };
+ 
+--- a/v8/src/heap/heap-verifier.cc
++++ b/v8/src/heap/heap-verifier.cc
+@@ -39,7 +39,7 @@ namespace v8 {
+ namespace internal {
+ 
+ namespace {
+-thread_local Tagged<HeapObject> pending_layout_change_object =
++thread_local _Alignas(64) Tagged<HeapObject> pending_layout_change_object =
+     Tagged<HeapObject>();
+ }  // namespace
+ 
+--- a/v8/src/heap/heap-write-barrier.cc
++++ b/v8/src/heap/heap-write-barrier.cc
+@@ -20,7 +20,7 @@ namespace v8 {
+ namespace internal {
+ 
+ namespace {
+-thread_local MarkingBarrier* current_marking_barrier = nullptr;
++thread_local _Alignas(64) MarkingBarrier* current_marking_barrier = nullptr;
+ }  // namespace
+ 
+ bool HeapObjectInYoungGenerationSticky(MemoryChunk* chunk,
+--- a/v8/src/heap/heap.cc
++++ b/v8/src/heap/heap.cc
+@@ -4010,7 +4010,7 @@ void Heap::InvokeIncrementalMarkingEpilogueCallbacks() {
+ }
+ 
+ namespace {
+-thread_local Address pending_layout_change_object_address = kNullAddress;
++thread_local _Alignas(64) Address pending_layout_change_object_address = kNullAddress;
+ 
+ #ifdef V8_ENABLE_SANDBOX
+ class ExternalPointerSlotInvalidator : public ObjectVisitor {
+--- a/v8/src/heap/local-heap.cc
++++ b/v8/src/heap/local-heap.cc
+@@ -29,7 +29,7 @@ namespace v8 {
+ namespace internal {
+ 
+ namespace {
+-thread_local LocalHeap* current_local_heap = nullptr;
++thread_local _Alignas(64) LocalHeap* current_local_heap = nullptr;
+ }  // namespace
+ 
+ LocalHeap* LocalHeap::Current() { return current_local_heap; }
+--- a/v8/src/init/isolate-group.cc
++++ b/v8/src/init/isolate-group.cc
+@@ -18,7 +18,7 @@ namespace v8 {
+ namespace internal {
+ 
+ #ifdef V8_COMPRESS_POINTERS_IN_MULTIPLE_CAGES
+-thread_local IsolateGroup* IsolateGroup::current_ = nullptr;
++thread_local _Alignas(64) IsolateGroup* IsolateGroup::current_ = nullptr;
+ 
+ // static
+ IsolateGroup* IsolateGroup::current_non_inlined() { return current_; }
+--- a/v8/src/init/isolate-group.h
++++ b/v8/src/init/isolate-group.h
+@@ -158,7 +158,7 @@ class V8_EXPORT_PRIVATE IsolateGroup final {
+ #endif  // V8_COMPRESS_POINTERS
+ 
+ #ifdef V8_COMPRESS_POINTERS_IN_MULTIPLE_CAGES
+-  thread_local static IsolateGroup* current_;
++  thread_local _Alignas(64) static IsolateGroup* current_;
+ #endif  // V8_COMPRESS_POINTERS_IN_MULTIPLE_CAGES
+ 
+   base::OnceType init_code_range_ = V8_ONCE_INIT;
+--- a/v8/src/logging/counters.cc
++++ b/v8/src/logging/counters.cc
+@@ -94,7 +94,7 @@ bool TimedHistogram::ToggleRunningState(bool expect_to_run) const {
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wexit-time-destructors"
+ #endif
+-  static thread_local std::unordered_map<const TimedHistogram*, bool>
++  static thread_local _Alignas(64) std::unordered_map<const TimedHistogram*, bool>
+       active_timer;
+ #if __clang__
+ #pragma clang diagnostic pop
+--- a/v8/src/trap-handler/handler-shared.cc
++++ b/v8/src/trap-handler/handler-shared.cc
+@@ -26,7 +26,7 @@ namespace trap_handler {
+ // We declare this as int rather than bool as a workaround for a glibc bug, in
+ // which the dynamic loader cannot handle executables whose TLS area is only
+ // 1 byte in size; see https://sourceware.org/bugzilla/show_bug.cgi?id=14898.
+-thread_local int g_thread_in_wasm_code;
++thread_local _Alignas(64) int g_thread_in_wasm_code;
+ 
+ static_assert(sizeof(g_thread_in_wasm_code) > 1,
+               "sizeof(thread_local_var) must be > 1, see "
+--- a/v8/src/trap-handler/trap-handler.h
++++ b/v8/src/trap-handler/trap-handler.h
+@@ -158,7 +158,7 @@ inline bool IsTrapHandlerEnabled() {
+ // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100641
+ extern __thread int g_thread_in_wasm_code;
+ #else
+-extern thread_local int g_thread_in_wasm_code;
++extern thread_local _Alignas(64) int g_thread_in_wasm_code;
+ #endif
+ 
+ // Return the address of the thread-local {g_thread_in_wasm_code} variable. This
+--- a/v8/src/wasm/wasm-code-manager.cc
++++ b/v8/src/wasm/wasm-code-manager.cc
+@@ -2731,7 +2731,7 @@ void WasmCodeManager::FlushCodeLookupCache(Isolate* isolate) {
+ }
+ 
+ namespace {
+-thread_local WasmCodeRefScope* current_code_refs_scope = nullptr;
++thread_local _Alignas(64) WasmCodeRefScope* current_code_refs_scope = nullptr;
+ }  // namespace
+ 
+ WasmCodeRefScope::WasmCodeRefScope()

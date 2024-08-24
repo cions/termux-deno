@@ -10,27 +10,28 @@ opt-level = 3
 [target."aarch64-linux-android"]
 linker = "clang"
 rustflags = [
+    "-C", "default-linker-libraries=yes",
     "-C", "target-cpu=cortex-a75",
     "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
-    "-C", "default-linker-libraries=yes",
+    "-C", "link-arg=-Wl,-O2",
+    "-C", "link-arg=-Wl,--as-needed",
+    "-Z", "tls-model=emulated"
 ]
 
 [patch.crates-io]
+v8 = { path = "/data/data/com.termux/files/usr/tmp/rusty_v8" }
+libsui = { path = "/data/data/com.termux/files/usr/tmp/sui" }
 deno_webgpu = { path = "/data/data/com.termux/files/usr/tmp/deno/ext/webgpu" }
 
 [env]
 CC = "clang"
 CXX = "clang++"
-LD = "ld.lld"
 AR = "llvm-ar"
 NM = "llvm-nm"
-CC_aarch64_linux_android = "clang"
-CXX_aarch64_linux_android = "clang++"
-AR_aarch64_linux_android = "llvm-ar"
-NM_aarch64_linux_android = "llvm-nm"
-CFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -pipe -Wno-error=implicit-function-declaration"
-CXXFLAGS_aarch64_linux_android = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -pipe -Wno-error=implicit-function-declaration"
+CFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls -Wno-error=implicit-function-declaration"
+CXXFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls -Wno-error=implicit-function-declaration"
 CXXSTDLIB = "c++_shared"
 
 RUSTY_V8_ARCHIVE = "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
+RUSTY_V8_SRC_BINDING_PATH = "/data/data/com.termux/files/usr/tmp/src_binding.rs"
 GN_ARGS = "use_custom_libcxx=false"

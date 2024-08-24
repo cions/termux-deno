@@ -1,7 +1,7 @@
 --- a/build/toolchain/gcc_toolchain.gni
 +++ b/build/toolchain/gcc_toolchain.gni
-@@ -859,22 +859,32 @@ template("gcc_toolchain") {
- # use_gold too.
+@@ -904,22 +904,32 @@ template("gcc_toolchain") {
+ # actually just be doing a native compile.
  template("clang_toolchain") {
    gcc_toolchain(target_name) {
 -    _path = "$clang_base_path/bin"
@@ -42,5 +42,5 @@
 -    nm = "${prefix}/llvm-nm"
 +    readelf = "llvm-readelf"
  
-     forward_variables_from(invoker,
-                            [
+     forward_variables_from(invoker, "*", [ "toolchain_args" ])
+ 

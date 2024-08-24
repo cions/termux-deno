@@ -1,6 +1,6 @@
 --- a/v8/src/handles/handles.h
 +++ b/v8/src/handles/handles.h
-@@ -479,18 +479,15 @@ class DirectHandle : public DirectHandleBase {
+@@ -477,18 +477,15 @@ class DirectHandle : public DirectHandleBase {
                                                    : kTaggedNullAddress) {}
  
    V8_INLINE Tagged<T> operator->() const {
