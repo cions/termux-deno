@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.46.0"
+ARG DENO_VERSION="v1.46.1"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
 ARG RUSTY_V8_VERSION="v0.104.0"
 ARG LIBSUI_VERSION="1c6d863f2cc037905de4220f7e8b9cefd3a8da35"

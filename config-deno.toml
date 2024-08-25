@@ -10,12 +10,12 @@ opt-level = 3
 [target."aarch64-linux-android"]
 linker = "clang"
 rustflags = [
-    "-C", "default-linker-libraries=yes",
-    "-C", "target-cpu=cortex-a75",
-    "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
-    "-C", "link-arg=-Wl,-O2",
-    "-C", "link-arg=-Wl,--as-needed",
-    "-Z", "tls-model=emulated"
+	"-C", "default-linker-libraries=yes",
+	"-C", "target-cpu=cortex-a75",
+	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+	"-C", "link-arg=-Wl,-O2",
+	"-C", "link-arg=-Wl,--as-needed",
+	"-Z", "tls-model=emulated"
 ]
 
 [patch.crates-io]

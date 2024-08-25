@@ -12,21 +12,21 @@ opt-level = 3
 
 [host]
 rustflags = [
-    "-C", "target-cpu=native",
-    "-C", "link-arg=-fuse-ld=lld",
+	"-C", "target-cpu=native",
+	"-C", "link-arg=-fuse-ld=lld",
 ]
 
 [target."aarch64-linux-android"]
 rustflags = [
-    "-C", "target-cpu=cortex-a75",
-    "-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
-    "-Z", "tls-model=emulated",
+	"-C", "target-cpu=cortex-a75",
+	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+	"-Z", "tls-model=emulated",
 ]
 
 [target."x86_64-unknown-linux-gnu"]
 rustflags = [
-    "-C", "target-cpu=native",
-    "-C", "link-arg=-fuse-ld=lld",
+	"-C", "target-cpu=native",
+	"-C", "link-arg=-fuse-ld=lld",
 ]
 
 [env]
