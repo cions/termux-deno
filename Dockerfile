@@ -1,10 +1,9 @@
 # syntax=docker/dockerfile:1
 
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v1.46.1"
+ARG DENO_VERSION="v1.46.2"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
-ARG RUSTY_V8_VERSION="v0.104.0"
-ARG LIBSUI_VERSION="1c6d863f2cc037905de4220f7e8b9cefd3a8da35"
+ARG RUSTY_V8_VERSION="v0.105.0"
 
 
 FROM --platform=linux/amd64 golang:latest AS resolver
@@ -49,15 +48,8 @@ ENV CC="${CC_aarch64_linux_android}" \
     BUILD_CXX="${CXX_x86_64_unknown_linux_gnu}" \
     BUILD_AR="${AR_x86_64_unknown_linux_gnu}" \
     BUILD_NM="${NM_x86_64_unknown_linux_gnu}"
-ENV __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS="nightly" \
-    RUSTC_BOOTSTRAP="1" \
-    CARGO_UNSTABLE_HOST_CONFIG="true" \
-    CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST="true" \
-    CARGO_TARGET_APPLIES_TO_HOST="false" \
-    CARGO_BUILD_TARGET_DIR="/cargo-build" \
-    CARGO_HOST_LINKER="${CC_x86_64_unknown_linux_gnu}" \
+ENV CARGO_BUILD_TARGET_DIR="/cargo-build" \
     CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="${CC_aarch64_linux_android}" \
-    CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER="${CC_x86_64_unknown_linux_gnu}" \
     CARGO_NET_GIT_FETCH_WITH_CLI="true"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -92,8 +84,7 @@ ARG RUSTY_V8_VERSION
 ADD --link https://github.com/denoland/rusty_v8.git#${RUSTY_V8_VERSION} rusty_v8
 
 COPY *.patch .
-RUN patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch \
- && patch -d rusty_v8 -p1 < rusty_v8-fix-static_assert.patch
+RUN patch -d rusty_v8 -p1 < rusty_v8-cross-toolchain.patch
 
 RUN env -C rusty_v8 cargo +stable build --release --locked -vv \
  && cp "${CARGO_BUILD_TARGET_DIR}/${TARGET}/release/gn_out/obj/librusty_v8.a" /librusty_v8.a \
@@ -128,8 +119,7 @@ RUN --mount=type=cache,target=/data/data/com.termux/files/usr/var/lib/apt,uid=10
         termux-elf-cleaner \
  && ln -sf aarch64-linux-android/asm /data/data/com.termux/files/usr/include/asm
 
-ENV RUSTC_BOOTSTRAP="1" \
-    CARGO_BUILD_TARGET_DIR="/data/data/com.termux/files/home/cargo-build" \
+ENV CARGO_BUILD_TARGET_DIR="/data/data/com.termux/files/home/cargo-build" \
     CARGO_INSTALL_ROOT="/data/data/com.termux/files/home/cargo-install" \
     CARGO_NET_GIT_FETCH_WITH_CLI="true"
 
@@ -138,28 +128,10 @@ COPY --from=build-rusty_v8 --chown=system /src_binding.rs /data/data/com.termux/
 
 COPY --chown=system config-deno.toml /data/data/com.termux/files/home/.cargo/config.toml
 
-ARG RUSTY_V8_VERSION
-ADD --chown=system --link https://github.com/denoland/rusty_v8.git#${RUSTY_V8_VERSION} /data/data/com.termux/files/usr/tmp/rusty_v8
-
-ARG LIBSUI_VERSION
-ADD --chown=system --link https://github.com/denoland/sui.git#${LIBSUI_VERSION} /data/data/com.termux/files/usr/tmp/sui
-
 ARG DENO_VERSION
-ADD --chown=system --link https://github.com/denoland/deno.git#${DENO_VERSION} /data/data/com.termux/files/usr/tmp/deno
-
-COPY --chown=system *.patch .
-RUN patch -d /data/data/com.termux/files/usr/tmp/rusty_v8 -p1 < rusty_v8-src-binding-path.patch \
- && patch -d /data/data/com.termux/files/usr/tmp/sui -p1 < libsui-android.patch \
- && patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch
-
 RUN --mount=type=cache,target=/data/data/com.termux/files/home/.cargo/registry,uid=1000,gid=1000,sharing=locked \
     --mount=type=cache,target=${CARGO_BUILD_TARGET_DIR},uid=1000,gid=1000,sharing=locked \
-    cargo install --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli
-
-# ARG DENO_VERSION
-# RUN --mount=type=cache,target=/data/data/com.termux/files/home/.cargo/registry,uid=1000,gid=1000,sharing=locked \
-#     --mount=type=cache,target=${CARGO_BUILD_TARGET_DIR},uid=1000,gid=1000,sharing=locked \
-#     cargo install --locked -vv --version="${DENO_VERSION#v}" deno
+    cargo install --locked -vv --version="${DENO_VERSION#v}" deno
 
 RUN termux-elf-cleaner /data/data/com.termux/files/home/cargo-install/bin/deno
 

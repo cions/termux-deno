@@ -7,26 +7,10 @@ lto = "thin"
 opt-level = 3
 strip = "symbols"
 
-[profile.release.build-override]
-opt-level = 3
-
-[host]
-rustflags = [
-	"-C", "target-cpu=native",
-	"-C", "link-arg=-fuse-ld=lld",
-]
-
 [target."aarch64-linux-android"]
 rustflags = [
 	"-C", "target-cpu=cortex-a75",
 	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
-	"-Z", "tls-model=emulated",
-]
-
-[target."x86_64-unknown-linux-gnu"]
-rustflags = [
-	"-C", "target-cpu=native",
-	"-C", "link-arg=-fuse-ld=lld",
 ]
 
 [env]
@@ -34,11 +18,8 @@ CFLAGS = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -femulated-tls"
 CXXFLAGS = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -femulated-tls"
 BUILD_CFLAGS = "-O3 -march=native"
 BUILD_CXXFLAGS = "-O3 -march=native"
-BUILD_LDFLAGS = "-fuse-ld=lld"
-CFLAGS_aarch64_linux_android = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls"
-CXXFLAGS_aarch64_linux_android = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls"
-CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native -flto=thin"
-CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native -flto=thin"
+CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
+CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
 CXXSTDLIB = "c++"
 
 V8_FROM_SOURCE = "1"
@@ -47,9 +28,9 @@ host_os="linux" \
 host_cpu="x64" \
 target_os="android" \
 target_cpu="arm64" \
-custom_toolchain="//build/toolchain/android:android_clang_arm64" \
-host_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
-v8_snapshot_toolchain="//build/toolchain/linux:clang_x64_v8_arm64" \
+custom_toolchain="//build/toolchain/linux/unbundle:default" \
+host_toolchain="//build/toolchain/linux/unbundle:host" \
+v8_snapshot_toolchain="//build/toolchain/linux/unbundle:host" \
 clang_version="18" \
 android_ndk_root="/opt/android-ndk-r27" \
 android_ndk_version="r27" \

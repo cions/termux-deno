@@ -1,8 +1,7 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v1.46.1"
-RUSTY_V8_VERSION = "v0.104.0"
-LIBSUI_VERSION = "1c6d863f2cc037905de4220f7e8b9cefd3a8da35"
+DENO_VERSION = "v1.46.2"
+RUSTY_V8_VERSION = "v0.105.0"
 
 
 def main():
@@ -41,15 +40,8 @@ def main():
                 "BUILD_CXX": "${CXX_x86_64_unknown_linux_gnu}",
                 "BUILD_AR": "${AR_x86_64_unknown_linux_gnu}",
                 "BUILD_NM": "${NM_x86_64_unknown_linux_gnu}",
-                "__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS": "nightly",
-                "RUSTC_BOOTSTRAP": "1",
-                "CARGO_UNSTABLE_HOST_CONFIG": "true",
-                "CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST": "true",
-                "CARGO_TARGET_APPLIES_TO_HOST": "false",
                 "CARGO_BUILD_TARGET_DIR": "${CIRRUS_WORKING_DIR}/cargo-build",
-                "CARGO_HOST_LINKER": "${CC_x86_64_unknown_linux_gnu}",
                 "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER": "${CC_aarch64_linux_android}",
-                "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "${CC_x86_64_unknown_linux_gnu}",
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
             },
             instructions=[
@@ -70,8 +62,7 @@ def main():
                     'install -D config-rusty_v8.toml .cargo/config.toml',
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" https://github.com/denoland/rusty_v8.git rusty_v8',
-                    'patch -d rusty_v8 -p1 < rusty_v8-custom-toolchain.patch',
-                    'patch -d rusty_v8 -p1 < rusty_v8-fix-static_assert.patch',
+                    'patch -d rusty_v8 -p1 < rusty_v8-cross-toolchain.patch',
                 ),
                 script("build",
                     'env -C rusty_v8 cargo +stable build --release --locked -vv',
@@ -88,10 +79,7 @@ def main():
             depends_on=["Build librusty_v8.a"],
             instance=arm_container(dockerfile="Dockerfile.cirrus", cpu=8, memory="8G"),
             env={
-                "RUSTY_V8_VERSION": RUSTY_V8_VERSION,
                 "DENO_VERSION": DENO_VERSION,
-                "LIBSUI_VERSION": LIBSUI_VERSION,
-                "RUSTC_BOOTSTRAP": "1",
                 "CARGO_BUILD_TARGET_DIR": "/data/data/com.termux/files/home/cargo-build",
                 "CARGO_INSTALL_ROOT": "/data/data/com.termux/files/home/cargo-install",
                 "CARGO_NET_GIT_FETCH_WITH_CLI": "true",
@@ -103,16 +91,7 @@ def main():
 
                     'install -D config-deno.toml /data/data/com.termux/files/home/.cargo/config.toml',
 
-                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${RUSTY_V8_VERSION}" https://github.com/denoland/rusty_v8.git /data/data/com.termux/files/usr/tmp/rusty_v8',
-                    'patch -d /data/data/com.termux/files/usr/tmp/rusty_v8 -p1 < rusty_v8-src-binding-path.patch',
-
-                    'git clone https://github.com/denoland/sui.git /data/data/com.termux/files/usr/tmp/sui && git -C /data/data/com.termux/files/usr/tmp/sui checkout "${LIBSUI_VERSION}"',
-                    'patch -d /data/data/com.termux/files/usr/tmp/sui -p1 < libsui-android.patch',
-
-                    'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" https://github.com/denoland/deno.git /data/data/com.termux/files/usr/tmp/deno',
-                    'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byow.patch',
-                    'cargo install --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli',
-                    # 'cargo install --locked -vv --version="${DENO_VERSION#v}" deno',
+                    'cargo install --locked -vv --version="${DENO_VERSION#v}" deno',
 
                     'termux-elf-cleaner "${CARGO_INSTALL_ROOT}/bin/deno"',
 
