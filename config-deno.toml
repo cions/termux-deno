@@ -13,9 +13,6 @@ rustflags = [
 	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
 ]
 
-[patch.crates-io]
-libsui = { git = "https://github.com/denoland/sui.git", rev = "34d85999ce5b28791fa64c95f98f27ca2d7b8b79" }
-
 [env]
 CC = "clang"
 CXX = "clang++"
