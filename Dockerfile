@@ -131,7 +131,8 @@ COPY --chown=system config-deno.toml /data/data/com.termux/files/home/.cargo/con
 ARG DENO_VERSION
 ADD --chown=system --link https://github.com/denoland/deno.git#${DENO_VERSION} /data/data/com.termux/files/usr/tmp/deno
 COPY --chown=system *.patch .
-RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byowerror.patch
+RUN patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byowerror.patch \
+ && patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-specifier-prefix.patch
 
 RUN --mount=type=cache,target=/data/data/com.termux/files/home/.cargo/registry,uid=1000,gid=1000,sharing=locked \
     --mount=type=cache,target=${CARGO_BUILD_TARGET_DIR},uid=1000,gid=1000,sharing=locked \

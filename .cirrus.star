@@ -93,6 +93,7 @@ def main():
 
                     'git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" https://github.com/denoland/deno.git /data/data/com.termux/files/usr/tmp/deno',
                     'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-webgpu-byowerror.patch',
+                    'patch -d /data/data/com.termux/files/usr/tmp/deno -p1 < deno-fix-specifier-prefix.patch',
                     'cargo install --locked -vv --path /data/data/com.termux/files/usr/tmp/deno/cli',
                     # 'cargo install --locked -vv --version="${DENO_VERSION#v}" deno',
 
