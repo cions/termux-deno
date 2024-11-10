@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # curl -fsSL https://raw.githubusercontent.com/rust-lang/crates.io-index/master/de/no/deno | tail -n1 | jq -r '.vers'
-ARG DENO_VERSION="v2.0.5"
+ARG DENO_VERSION="v2.0.6"
 # curl -fsSL https://raw.githubusercontent.com/denoland/deno/main/Cargo.lock | grep -A 1 'name = "v8"'
 ARG RUSTY_V8_VERSION="v0.106.0"
 
@@ -24,7 +24,7 @@ FROM --platform=linux/amd64 rust:latest AS build-rusty_v8
 ENV HOST="x86_64-unknown-linux-gnu" \
     TARGET="aarch64-linux-android" \
     LLVM_VERSION="18" \
-    ANDROID_NDK_VERSION="r27b" \
+    ANDROID_NDK_VERSION="r27c" \
     ANDROID_API="29"
 ENV ANDROID_NDK="/opt/android-ndk-${ANDROID_NDK_VERSION}"
 ENV ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin" \
