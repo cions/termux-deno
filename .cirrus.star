@@ -1,6 +1,6 @@
 load("github.com/cirrus-modules/helpers", "task", "container", "arm_container", "script", "artifacts")
 
-DENO_VERSION = "v2.1.1"
+DENO_VERSION = "v2.1.2"
 RUSTY_V8_VERSION = "v130.0.1"
 
 
