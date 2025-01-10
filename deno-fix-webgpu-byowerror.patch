@@ -1,42 +1,21 @@
 --- a/ext/webgpu/byow.rs
 +++ b/ext/webgpu/byow.rs
-@@ -16,6 +16,8 @@ use crate::surface::WebGpuSurface;
+@@ -17,6 +17,9 @@ use crate::surface::WebGpuSurface;
  
- #[derive(Debug, thiserror::Error)]
+ #[derive(Debug, thiserror::Error, deno_error::JsError)]
  pub enum ByowError {
++  #[class(type)]
 +  #[error("Unsupported platform")]
 +  Unsupported,
+   #[class(type)]
    #[error("Cannot create surface outside of WebGPU context. Did you forget to call `navigator.gpu.requestAdapter()`?")]
    WebGPUNotInitiated,
-   #[error("Invalid parameters")]
-@@ -198,6 +200,6 @@ fn raw_window(
+@@ -208,6 +211,6 @@ fn raw_window(
    _system: &str,
    _window: *const c_void,
    _display: *const c_void,
--) -> Result<RawHandles, deno_core::error::AnyError> {
--  Err(deno_core::error::type_error("Unsupported platform"))
+-) -> Result<RawHandles, deno_error::JsErrorBox> {
+-  Err(deno_error::JsErrorBox::type_error("Unsupported platform"))
 +) -> Result<RawHandles, ByowError> {
 +  Err(ByowError::Unsupported)
  }
-diff --git a/runtime/errors.rs b/runtime/errors.rs
-index 07bf694dc..4639fef8c 100644
---- a/runtime/errors.rs
-+++ b/runtime/errors.rs
-@@ -236,9 +236,17 @@ fn get_webgpu_byow_error_class(
-   e: &deno_webgpu::byow::ByowError,
- ) -> &'static str {
-   match e {
-+    deno_webgpu::byow::ByowError::Unsupported => "TypeError",
-     deno_webgpu::byow::ByowError::WebGPUNotInitiated => "TypeError",
-     deno_webgpu::byow::ByowError::InvalidParameters => "TypeError",
-     deno_webgpu::byow::ByowError::CreateSurface(_) => "Error",
-+    #[cfg(any(
-+      target_os = "windows",
-+      target_os = "macos",
-+      target_os = "linux",
-+      target_os = "freebsd",
-+      target_os = "openbsd"
-+    ))]
-     deno_webgpu::byow::ByowError::InvalidSystem => "TypeError",
-     #[cfg(any(
-       target_os = "windows",
