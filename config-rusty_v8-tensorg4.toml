@@ -9,13 +9,12 @@ strip = "symbols"
 
 [target."aarch64-linux-android"]
 rustflags = [
-	"-C", "target-cpu=cortex-a75",
-	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+	"-C", "target-cpu=cortex-x4",
 ]
 
 [env]
-CFLAGS = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -femulated-tls"
-CXXFLAGS = "-O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -femulated-tls"
+CFLAGS = "-O3 -mcpu=cortex-x4 -femulated-tls"
+CXXFLAGS = "-O3 -mcpu=cortex-x4 -femulated-tls"
 BUILD_CFLAGS = "-O3 -march=native"
 BUILD_CXXFLAGS = "-O3 -march=native"
 CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
@@ -32,9 +31,9 @@ custom_toolchain="//build/toolchain/linux/unbundle:default" \
 host_toolchain="//build/toolchain/linux/unbundle:host" \
 v8_snapshot_toolchain="//build/toolchain/linux/unbundle:host" \
 clang_version="18" \
-android_ndk_root="/opt/android-ndk-r27c" \
+android_ndk_root="/home/runner/work/termux-deno/android-ndk-r27c" \
 android_ndk_version="r27c" \
-android64_ndk_api_level=29 \
+android64_ndk_api_level=34 \
 is_official_build=true \
 is_high_end_android=true \
 optimize_for_size=false \

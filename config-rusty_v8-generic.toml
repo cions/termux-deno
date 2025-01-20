@@ -1,0 +1,49 @@
+[build]
+target = "aarch64-linux-android"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = 3
+strip = "symbols"
+
+[env]
+CFLAGS = "-O3 -femulated-tls"
+CXXFLAGS = "-O3 -femulated-tls"
+BUILD_CFLAGS = "-O3 -march=native"
+BUILD_CXXFLAGS = "-O3 -march=native"
+CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
+CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
+CXXSTDLIB = "c++"
+
+V8_FROM_SOURCE = "1"
+GN_ARGS = """\
+host_os="linux" \
+host_cpu="x64" \
+target_os="android" \
+target_cpu="arm64" \
+custom_toolchain="//build/toolchain/linux/unbundle:default" \
+host_toolchain="//build/toolchain/linux/unbundle:host" \
+v8_snapshot_toolchain="//build/toolchain/linux/unbundle:host" \
+clang_version="18" \
+android_ndk_root="/home/runner/work/termux-deno/android-ndk-r27c" \
+android_ndk_version="r27c" \
+android64_ndk_api_level=24 \
+is_official_build=true \
+is_high_end_android=false \
+optimize_for_size=false \
+is_component_build=false \
+use_custom_libcxx=false \
+use_thin_lto=false \
+is_debug=false \
+symbol_level=0 \
+v8_symbol_level=0 \
+strip_debug_info=true \
+is_cfi=false \
+arm_control_flow_integrity="none" \
+chrome_pgo_phase=0 \
+enable_resource_allowlist_generation=false \
+v8_builtins_profiling_log_file="" \
+v8_advanced_bigint_algorithms=true \
+v8_use_siphash=true\
+"""

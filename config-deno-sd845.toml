@@ -1,0 +1,28 @@
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = 3
+strip = "symbols"
+
+[target."aarch64-linux-android"]
+linker = "clang"
+rustflags = [
+	"-C", "default-linker-libraries=yes",
+	"-C", "linker-plugin-lto",
+	"-C", "link-arg=--target=aarch64-linux-android29",
+	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/29",
+	"-C", "target-cpu=cortex-a75",
+	"-C", "target-feature=+aes,+crc,-dotprod,+fp16,+lse,+neon,-ras,-rcpc,-rdm,+sha2",
+]
+
+[env]
+CC = "clang"
+CXX = "clang++"
+AR = "llvm-ar"
+NM = "llvm-nm"
+CFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls"
+CXXFLAGS = "--target=aarch64-linux-android29 -O3 -mcpu=cortex-a75+nodotprod+noras+norcpc+nordm -flto=thin -femulated-tls"
+LDFLAGS = "--target=aarch64-linux-android29 -B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/29"
+CXXSTDLIB = "c++_shared"
+
+GN_ARGS = "use_custom_libcxx=false"

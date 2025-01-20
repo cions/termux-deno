@@ -1,0 +1,27 @@
+[profile.release]
+codegen-units = 1
+lto = "thin"
+opt-level = 3
+strip = "symbols"
+
+[target."aarch64-linux-android"]
+linker = "clang"
+rustflags = [
+	"-C", "default-linker-libraries=yes",
+	"-C", "linker-plugin-lto",
+	"-C", "link-arg=--target=aarch64-linux-android34",
+	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/34",
+	"-C", "target-cpu=cortex-x4",
+]
+
+[env]
+CC = "clang"
+CXX = "clang++"
+AR = "llvm-ar"
+NM = "llvm-nm"
+CFLAGS = "--target=aarch64-linux-android34 -O3 -mcpu=cortex-x4 -flto=thin -femulated-tls"
+CXXFLAGS = "--target=aarch64-linux-android34 -O3 -mcpu=cortex-x4 -flto=thin -femulated-tls"
+LDFLAGS = "--target=aarch64-linux-android34 -B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/34"
+CXXSTDLIB = "c++_shared"
+
+GN_ARGS = "use_custom_libcxx=false"

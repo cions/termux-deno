@@ -1,6 +1,6 @@
 --- a/cli/tools/registry/pm.rs
 +++ b/cli/tools/registry/pm.rs
-@@ -562,7 +562,7 @@ fn best_version<'a>(
+@@ -589,7 +589,7 @@ fn best_version<'a>(
  }
  
  trait PackageInfoProvider {
@@ -9,7 +9,7 @@
    /// The help to return if a package is found by this provider
    const HELP: NotFoundHelp;
    async fn req_to_nv(&self, req: &PackageReq) -> Option<PackageNv>;
-@@ -571,7 +571,7 @@ trait PackageInfoProvider {
+@@ -598,7 +598,7 @@ trait PackageInfoProvider {
  
  impl PackageInfoProvider for Arc<JsrFetchResolver> {
    const HELP: NotFoundHelp = NotFoundHelp::JsrPackage;
@@ -18,7 +18,7 @@
    async fn req_to_nv(&self, req: &PackageReq) -> Option<PackageNv> {
      (**self).req_to_nv(req).await
    }
-@@ -591,7 +591,7 @@ impl PackageInfoProvider for Arc<JsrFetchResolver> {
+@@ -618,7 +618,7 @@ impl PackageInfoProvider for Arc<JsrFetchResolver> {
  
  impl PackageInfoProvider for Arc<NpmFetchResolver> {
    const HELP: NotFoundHelp = NotFoundHelp::NpmPackage;
