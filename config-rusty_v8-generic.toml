@@ -11,9 +11,11 @@ strip = "symbols"
 CFLAGS = "-O3 -femulated-tls"
 CXXFLAGS = "-O3 -femulated-tls"
 BUILD_CFLAGS = "-O3 -march=native"
-BUILD_CXXFLAGS = "-O3 -march=native"
+BUILD_CXXFLAGS = "-O3 -march=native -stdlib=libc++"
+BUILD_LDFLAGS = "-stdlib=libc++"
 CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
-CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
+CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native -stdlib=libc++"
+LDFLAGS_x86_64_unknown_linux_gnu = "-stdlib=libc++"
 CXXSTDLIB = "c++"
 
 V8_FROM_SOURCE = "1"
@@ -25,6 +27,7 @@ target_cpu="arm64" \
 custom_toolchain="//build/toolchain/linux/unbundle:default" \
 host_toolchain="//build/toolchain/linux/unbundle:host" \
 v8_snapshot_toolchain="//build/toolchain/linux/unbundle:host" \
+use_sysroot=false \
 clang_version="18" \
 android_ndk_root="/home/runner/work/termux-deno/android-ndk-r27c" \
 android_ndk_version="r27c" \
@@ -34,6 +37,7 @@ is_high_end_android=false \
 optimize_for_size=false \
 is_component_build=false \
 use_custom_libcxx=false \
+use_custom_libcxx_for_host=true \
 use_thin_lto=false \
 is_debug=false \
 symbol_level=0 \
