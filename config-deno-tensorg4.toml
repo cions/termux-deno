@@ -14,6 +14,9 @@ rustflags = [
 	"-C", "target-cpu=cortex-x4",
 ]
 
+[patch.crates.io]
+cranelift-codegen = { path = "/data/data/com.termux/files/home/cranelift-codegen" }
+
 [env]
 CC = "clang"
 CXX = "clang++"
