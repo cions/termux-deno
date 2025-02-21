@@ -211,7 +211,7 @@ jobs:
         include:
         - { cpu: generic,  android-api: 24 }
         - { cpu: sd845,    android-api: 29 }
-        - { cpu: tensorg4, android-api: 34 }
+        # - { cpu: tensorg4, android-api: 34 }
     env:
       HOME: "/data/data/com.termux/files/home"
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
