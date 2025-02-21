@@ -1,0 +1,29 @@
+--- a/build.rs
++++ b/build.rs
+@@ -40,8 +40,10 @@
+     "NINJA",
+     "OUT_DIR",
+     "RUSTY_V8_ARCHIVE",
++    "RUSTY_V8_ARCHIVE_TARGET",
+     "RUSTY_V8_MIRROR",
+     "RUSTY_V8_SRC_BINDING_PATH",
++    "RUSTY_V8_SRC_BINDING_PATH_TARGET",
+     "SCCACHE",
+     "V8_FORCE_DEBUG",
+     "V8_FROM_SOURCE",
+@@ -55,6 +57,15 @@
+     println!("cargo:rerun-if-env-changed={env}");
+   }
+ 
++  if env::var_os("CARGO_ENCODED_RUSTFLAGS").is_some_and(|rustflags| rustflags.to_string_lossy().contains("-Ctarget-cpu=")) {
++    if let Some(v) = env::var_os("RUSTY_V8_ARCHIVE_TARGET") {
++      env::set_var("RUSTY_V8_ARCHIVE", v);
++    }
++    if let Some(v) = env::var_os("RUSTY_V8_SRC_BINDING_PATH_TARGET") {
++      env::set_var("RUSTY_V8_SRC_BINDING_PATH", v);
++    }
++  }
++
+   // Detect if trybuild tests are being compiled.
+   let is_trybuild = env::var_os("DENO_TRYBUILD").is_some();
+ 

@@ -206,6 +206,7 @@ jobs:
         --user "system"
         --security-opt "seccomp:unconfined"
         --ulimit "nofile=1024:65536"
+    continue-on-error: ${{ matrix.cpu != 'generic' }}
     strategy:
       matrix:
         include:
@@ -215,7 +216,7 @@ jobs:
     env:
       HOME: "/data/data/com.termux/files/home"
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
-      REPOURL: ${{ github.event.repository.clone_url }}
+      REPOSITORY_URL: ${{ github.event.repository.clone_url }}
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
       DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
@@ -225,11 +226,14 @@ jobs:
       TARGET: "aarch64-linux-android"
       TARGET_CPU: ${{ matrix.cpu }}
       ANDROID_API: ${{ matrix.android-api }}
-      RUSTY_V8_ARCHIVE: "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
-      RUSTY_V8_SRC_BINDING_PATH: "/data/data/com.termux/files/usr/tmp/src_binding.rs"
+      RUSTY_V8_ARCHIVE: "/data/data/com.termux/files/usr/tmp/librusty_v8_generic.a"
+      RUSTY_V8_ARCHIVE_TARGET: "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
+      RUSTY_V8_SRC_BINDING_PATH: "/data/data/com.termux/files/usr/tmp/src_binding_generic.rs"
+      RUSTY_V8_SRC_BINDING_PATH_TARGET: "/data/data/com.termux/files/usr/tmp/src_binding.rs"
       CARGO_BUILD_TARGET_DIR: "/data/data/com.termux/files/usr/tmp/cargo-build"
       CARGO_INSTALL_ROOT: "/data/data/com.termux/files/usr/tmp/cargo-install"
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS: "nightly"
     defaults:
       run:
         working-directory: "/data/data/com.termux/files/home"
@@ -270,26 +274,44 @@ jobs:
     - name: Checkout
       run: |
         git init .
-        git remote add origin "${REPOURL}"
+        git remote add origin "${REPOSITORY_URL}"
         git fetch --progress --no-tags --depth=1 origin "${GITHUB_SHA}"
         git checkout --progress --force FETCH_HEAD
     - name: Install config.toml
       run: install -D "config-deno-${TARGET_CPU}.toml" ~/.cargo/config.toml
+    - name: Download librusty_v8_generic.a
+      env:
+        GH_REPO: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+        LIBRUSTY_V8_NAME: librusty_v8_${{ env.LIBRUSTY_V8_VERSION }}_generic.a
+      run: gh release download "${TAG_NAME}" --pattern "${LIBRUSTY_V8_NAME}" --output "${RUSTY_V8_ARCHIVE}"
     - name: Download librusty_v8.a
       env:
         GH_REPO: ${{ github.repository }}
         GH_TOKEN: ${{ github.token }}
         LIBRUSTY_V8_NAME: librusty_v8_${{ env.LIBRUSTY_V8_VERSION }}_${{ env.TARGET_CPU }}.a
-      run: gh release download "${TAG_NAME}" --pattern "${LIBRUSTY_V8_NAME}" --output "${RUSTY_V8_ARCHIVE}"
+      run: gh release download "${TAG_NAME}" --pattern "${LIBRUSTY_V8_NAME}" --output "${RUSTY_V8_ARCHIVE_TARGET}"
+    - name: Download src_binding_generic.rs
+      env:
+        GH_REPO: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+        SRC_BINDING_NAME: src_binding_${{ env.LIBRUSTY_V8_VERSION }}_generic.rs
+      run: gh release download "${TAG_NAME}" --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH}"
     - name: Download src_binding.rs
       env:
         GH_REPO: ${{ github.repository }}
         GH_TOKEN: ${{ github.token }}
         SRC_BINDING_NAME: src_binding_${{ env.LIBRUSTY_V8_VERSION }}_${{ env.TARGET_CPU }}.rs
-      run: gh release download "${TAG_NAME}" --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH}"
+      run: gh release download "${TAG_NAME}" --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH_TARGET}"
+    - name: Download v8
+      run: |
+        curl -fL "https://crates.io/api/v1/crates/v8/${LIBRUSTY_V8_VERSION#v}/download" | tar zxf -
+        mv "v8-${LIBRUSTY_V8_VERSION#v}" v8
+    - name: Patch v8
+      run: patch -d v8 -p1 < rusty_v8-generic-for-host.patch
     - name: Download cranelift-codegen
       run: |
-        curl -fsSL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | tar zxf -
+        curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | tar zxf -
         mv "cranelift-codegen-${CRANELIFT_CODEGEN_VERSION#v}" cranelift-codegen
     - name: Patch cranelift-codegen
       run: patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
@@ -309,12 +331,12 @@ jobs:
         GH_REPO: ${{ github.repository }}
         GH_TOKEN: ${{ github.token }}
       run: |
-        SUFFIX=""
+        PROGNAME="deno"
         if [[ "${TARGET_CPU}" != "generic" ]]; then
-            SUFFIX="_${TARGET_CPU}"
-            ln deno "deno${SUFFIX}"
+            PROGNAME+="_${TARGET_CPU}"
+            ln deno "${PROGNAME}"
         fi
-        gh release upload "${TAG_NAME}" "deno${SUFFIX}" --clobber
+        gh release upload "${TAG_NAME}" "${PROGNAME}" --clobber
 
   publish-release:
     name: Publish GitHub Release
