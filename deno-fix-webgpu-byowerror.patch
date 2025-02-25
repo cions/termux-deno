@@ -1,6 +1,6 @@
 --- a/ext/webgpu/byow.rs
 +++ b/ext/webgpu/byow.rs
-@@ -17,6 +17,9 @@ use crate::surface::WebGpuSurface;
+@@ -24,6 +24,9 @@ use crate::surface::GPUCanvasContext;
  
  #[derive(Debug, thiserror::Error, deno_error::JsError)]
  pub enum ByowError {
@@ -10,8 +10,8 @@
    #[class(type)]
    #[error("Cannot create surface outside of WebGPU context. Did you forget to call `navigator.gpu.requestAdapter()`?")]
    WebGPUNotInitiated,
-@@ -208,6 +211,6 @@ fn raw_window(
-   _system: &str,
+@@ -342,6 +345,6 @@ fn raw_window(
+   _system: UnsafeWindowSurfaceSystem,
    _window: *const c_void,
    _display: *const c_void,
 -) -> Result<RawHandles, deno_error::JsErrorBox> {

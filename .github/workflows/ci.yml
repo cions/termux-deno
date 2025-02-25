@@ -300,7 +300,6 @@ jobs:
     - name: Patch deno
       run: |
         patch -d deno -p1 < deno-fix-webgpu-byowerror.patch
-        patch -d deno -p1 < deno-fix-specifier-prefix.patch
     - name: Build deno
       run: cargo install --locked -vv --path deno/cli
     - name: Run termux-elf-cleaner
