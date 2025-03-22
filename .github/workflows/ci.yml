@@ -242,6 +242,7 @@ jobs:
         /system/bin/dnsmasq -u root -g root --no-resolv --server=1.1.1.1 --server=1.0.0.1 </dev/null &>/dev/null
     - name: Install packages
       env:
+        ANDROID__BUILD_VERSION_SDK: ${{ env.ANDROID_API }}
         DEBIAN_FRONTEND: "noninteractive"
       run: |
         echo 'APT::Get::Assume-Yes "true";' > "${PREFIX}/etc/apt/apt.conf.d/assumeyes"
