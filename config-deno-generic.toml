@@ -13,9 +13,6 @@ rustflags = [
 	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24",
 ]
 
-[patch.crates-io]
-cranelift-codegen = { path = "/data/data/com.termux/files/home/cranelift-codegen" }
-
 [env]
 CC = "clang"
 CXX = "clang++"

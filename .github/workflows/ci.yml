@@ -32,7 +32,6 @@ jobs:
     outputs:
       DENO_VERSION: ${{ steps.version.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
-      CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
     steps:
     - id: version
@@ -49,7 +48,6 @@ jobs:
         if [[ -z "${LIBRUSTY_V8_VERSION}" ]]; then
             LIBRUSTY_V8_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "v8"/{n;s/version = "\(.*\)"/v\1/;p}')"
         fi
-        CRANELIFT_CODEGEN_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "cranelift-codegen"/{n;s/version = "\(.*\)"/v\1/;p}')"
         TAG_NAME="${DENO_VERSION}"
         if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             TAG_NAME+="-pr${PR_NUMBER}"
@@ -58,7 +56,6 @@ jobs:
         fi
         echo "DENO_VERSION=${DENO_VERSION}" >> "${GITHUB_OUTPUT}"
         echo "LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}" >> "${GITHUB_OUTPUT}"
-        echo "CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}" >> "${GITHUB_OUTPUT}"
         echo "TAG_NAME=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
     - name: Create GitHub Release
       env:
@@ -218,7 +215,6 @@ jobs:
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
       REPOSITORY_URL: ${{ github.event.repository.clone_url }}
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
-      CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
       DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
       TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       build_alias: "aarch64-linux-android"
@@ -242,7 +238,6 @@ jobs:
         /system/bin/dnsmasq -u root -g root --no-resolv --server=1.1.1.1 --server=1.0.0.1 </dev/null &>/dev/null
     - name: Install packages
       env:
-        ANDROID__BUILD_VERSION_SDK: ${{ env.ANDROID_API }}
         DEBIAN_FRONTEND: "noninteractive"
       run: |
         echo 'APT::Get::Assume-Yes "true";' > "${PREFIX}/etc/apt/apt.conf.d/assumeyes"
@@ -290,14 +285,8 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         SRC_BINDING_NAME: src_binding_${{ env.LIBRUSTY_V8_VERSION }}_${{ env.TARGET_CPU }}.rs
       run: gh release download "${TAG_NAME}" --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH}"
-    - name: Download cranelift-codegen
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | tar zxf -
-        mv "cranelift-codegen-${CRANELIFT_CODEGEN_VERSION#v}" cranelift-codegen
-    - name: Patch cranelift-codegen
-      run: patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
     - name: Checkout deno
-      run: git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" https://github.com/denoland/deno.git
+      run: git clone --depth=1 --recurse-submodules --shallow-submodules --rev="${DENO_VERSION}" https://github.com/denoland/deno.git
     - name: Patch deno
       run: |
         patch -d deno -p1 < deno-fix-webgpu-byowerror.patch
