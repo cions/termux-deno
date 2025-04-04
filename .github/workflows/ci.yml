@@ -33,6 +33,7 @@ jobs:
       DENO_VERSION: ${{ steps.version.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
+      DENO_PANIC_VERSION: ${{ steps.version.outputs.DENO_PANIC_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
     steps:
     - id: version
@@ -50,6 +51,7 @@ jobs:
             LIBRUSTY_V8_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "v8"/{n;s/version = "\(.*\)"/v\1/;p}')"
         fi
         CRANELIFT_CODEGEN_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "cranelift-codegen"/{n;s/version = "\(.*\)"/v\1/;p}')"
+        DENO_PANIC_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "deno_panic"/{n;s/version = "\(.*\)"/v\1/;p}')"
         TAG_NAME="${DENO_VERSION}"
         if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             TAG_NAME+="-pr${PR_NUMBER}"
@@ -59,6 +61,7 @@ jobs:
         echo "DENO_VERSION=${DENO_VERSION}" >> "${GITHUB_OUTPUT}"
         echo "LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}" >> "${GITHUB_OUTPUT}"
         echo "CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}" >> "${GITHUB_OUTPUT}"
+        echo "DENO_PANIC_VERSION=${DENO_PANIC_VERSION}" >> "${GITHUB_OUTPUT}"
         echo "TAG_NAME=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
     - name: Create GitHub Release
       env:
@@ -219,6 +222,7 @@ jobs:
       REPOSITORY_URL: ${{ github.event.repository.clone_url }}
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
+      DENO_PANIC_VERSION: ${{ needs.create-release.outputs.DENO_PANIC_VERSION }}
       DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
       TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       build_alias: "aarch64-linux-android"
@@ -295,6 +299,12 @@ jobs:
         mv "cranelift-codegen-${CRANELIFT_CODEGEN_VERSION#v}" cranelift-codegen
     - name: Patch cranelift-codegen
       run: patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
+    - name: Download deno_panic
+      run: |
+        curl -fL "https://crates.io/api/v1/crates/deno_panic/${DENO_PANIC_VERSION#v}/download" | tar zxf -
+        mv "deno_panic-${DENO_PANIC_VERSION#v}" deno_panic
+    - name: Patch deno_panic
+      run: patch -d deno_panic -p1 < deno_panic-android.patch
     - name: Checkout deno
       run: git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" https://github.com/denoland/deno.git
     - name: Patch deno
