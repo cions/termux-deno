@@ -45,13 +45,14 @@ jobs:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       run: |
         if [[ -z "${DENO_VERSION}" ]]; then
-            DENO_VERSION="v$(curl -fsSL "https://index.crates.io/de/no/deno" | tail -n1 | jq -r '.vers')"
+            DENO_VERSION="v$(curl -fsSL "https://crates.io/api/v1/crates/deno" | jq -r '.crate.default_version')"
         fi
+        curl -fsSL "https://crates.io/api/v1/crates/deno/${DENO_VERSION#v}/download" | tar zxO "deno-${DENO_VERSION#v}/Cargo.lock" > Cargo.lock
         if [[ -z "${LIBRUSTY_V8_VERSION}" ]]; then
-            LIBRUSTY_V8_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "v8"/{n;s/version = "\(.*\)"/v\1/;p}')"
+            LIBRUSTY_V8_VERSION="$(sed -n '/^name = "v8"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
         fi
-        CRANELIFT_CODEGEN_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "cranelift-codegen"/{n;s/version = "\(.*\)"/v\1/;p}')"
-        DENO_PANIC_VERSION="$(curl -fsSL "https://raw.githubusercontent.com/denoland/deno/${DENO_VERSION}/Cargo.lock" | sed -n '/^name = "deno_panic"/{n;s/version = "\(.*\)"/v\1/;p}')"
+        CRANELIFT_CODEGEN_VERSION="$(sed -n '/^name = "cranelift-codegen"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
+        DENO_PANIC_VERSION="$(sed -n '/^name = "deno_panic"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
         TAG_NAME="${DENO_VERSION}"
         if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             TAG_NAME+="-pr${PR_NUMBER}"
