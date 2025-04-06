@@ -1,7 +1,10 @@
 [profile.release]
 codegen-units = 1
+debug = false
+incremental = false
 lto = "thin"
 opt-level = 3
+split-debuginfo = "off"
 strip = "symbols"
 
 [target."aarch64-linux-android"]
