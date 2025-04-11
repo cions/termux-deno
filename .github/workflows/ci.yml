@@ -22,19 +22,23 @@ permissions:
   contents: write
 
 env:
-  ANDROID_NDK_VERSION: "r27c"
-  LLVM_VERSION: "18"
+  ANDROID_NDK_VERSION: "r28"
+  LLVM_VERSION: "19"
 
 jobs:
   create-release:
     name: Create GitHub Release
+
     runs-on: ubuntu-latest
+
     outputs:
       DENO_VERSION: ${{ steps.version.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
       DENO_PANIC_VERSION: ${{ steps.version.outputs.DENO_PANIC_VERSION }}
+      DENO_WEBGPU_VERSION: ${{ steps.version.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
+
     steps:
     - id: version
       name: Set versions and tag name
@@ -45,25 +49,39 @@ jobs:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       run: |
         if [[ -z "${DENO_VERSION}" ]]; then
-            DENO_VERSION="v$(curl -fsSL "https://crates.io/api/v1/crates/deno" | jq -r '.crate.default_version')"
+            DENO_VERSION="v$(curl -fsSL "https://crates.io/api/v1/crates/deno" | \
+                             jq -r '.crate.default_version')"
         fi
-        curl -fsSL "https://crates.io/api/v1/crates/deno/${DENO_VERSION#v}/download" | tar zxO "deno-${DENO_VERSION#v}/Cargo.lock" > Cargo.lock
+
+        curl -fsSLO "https://raw.githubusercontent.com/denoland/deno/refs/tags/${DENO_VERSION}/Cargo.lock"
+
+        deno_dep_version() {
+            sed -n '/^name = "'"$1"'"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock
+        }
+
         if [[ -z "${LIBRUSTY_V8_VERSION}" ]]; then
-            LIBRUSTY_V8_VERSION="$(sed -n '/^name = "v8"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
+            LIBRUSTY_V8_VERSION="$(deno_dep_version "v8")"
         fi
-        CRANELIFT_CODEGEN_VERSION="$(sed -n '/^name = "cranelift-codegen"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
-        DENO_PANIC_VERSION="$(sed -n '/^name = "deno_panic"/{n;s/version = "\(.*\)"/v\1/;p}' Cargo.lock)"
+        CRANELIFT_CODEGEN_VERSION="$(deno_dep_version "cranelift-codegen")"
+        DENO_PANIC_VERSION="$(deno_dep_version "deno_panic")"
+        DENO_WEBGPU_VERSION="$(deno_dep_version "deno_webgpu")"
+
         TAG_NAME="${DENO_VERSION}"
         if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             TAG_NAME+="-pr${PR_NUMBER}"
         elif [[ "${GITHUB_REF_NAME}" != "${DEFAULT_BRANCH}" ]]; then
             TAG_NAME+="-${GITHUB_REF_NAME//[^[:alnum:]-]/_}"
         fi
-        echo "DENO_VERSION=${DENO_VERSION}" >> "${GITHUB_OUTPUT}"
-        echo "LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}" >> "${GITHUB_OUTPUT}"
-        echo "CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}" >> "${GITHUB_OUTPUT}"
-        echo "DENO_PANIC_VERSION=${DENO_PANIC_VERSION}" >> "${GITHUB_OUTPUT}"
-        echo "TAG_NAME=${TAG_NAME}" >> "${GITHUB_OUTPUT}"
+
+        cat <<EOF >> "${GITHUB_OUTPUT}"
+        DENO_VERSION=${DENO_VERSION}
+        LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}
+        CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}
+        DENO_PANIC_VERSION=${DENO_PANIC_VERSION}
+        DENO_WEBGPU_VERSION=${DENO_WEBGPU_VERSION}
+        TAG_NAME=${TAG_NAME}
+        EOF
+
     - name: Create GitHub Release
       env:
         GH_REPO: ${{ github.repository }}
@@ -82,35 +100,43 @@ jobs:
         fi
         gh release create "${TAG_NAME}" "${opts[@]}"
 
+
   build-rustyv8:
     name: Build librusty_v8.a
+
     needs:
     - create-release
+
     runs-on: ubuntu-24.04
+
     strategy:
       matrix:
         include:
         - { cpu: generic,  android-api: 24 }
         - { cpu: sd845,    android-api: 29 }
         - { cpu: tensorg4, android-api: 34 }
+
     env:
-      LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
-      TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       HOST: "x86_64-unknown-linux-gnu"
       TARGET: "aarch64-linux-android"
       TARGET_CPU: ${{ matrix.cpu }}
       ANDROID_API: ${{ matrix.android-api }}
+      LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
+      TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       CARGO_BUILD_TARGET_DIR: ${{ github.workspace }}/cargo-build
-      CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: Setup LLVM
       env:
         DEBIAN_FRONTEND: "noninteractive"
       run: |
-        echo "deb https://apt.llvm.org/noble/ llvm-toolchain-noble-${LLVM_VERSION} main" | sudo tee /etc/apt/sources.list.d/llvm.list
-        sudo curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+        echo "deb https://apt.llvm.org/noble/ llvm-toolchain-noble-${LLVM_VERSION} main" | \
+            sudo tee /etc/apt/sources.list.d/llvm.list
+        sudo curl -fsSL -o /etc/apt/trusted.gpg.d/apt.llvm.org.asc \
+            https://apt.llvm.org/llvm-snapshot.gpg.key
         sudo apt-get update -qq
         sudo apt-get install -qy --no-install-recommends \
             "clang-${LLVM_VERSION}" \
@@ -118,52 +144,65 @@ jobs:
             "libclang-rt-${LLVM_VERSION}-dev" \
             "lld-${LLVM_VERSION}" \
             "llvm-${LLVM_VERSION}"
+
         BINDIR="/usr/lib/llvm-${LLVM_VERSION}/bin"
         CC="${BINDIR}/clang"
         CXX="${BINDIR}/clang++"
         AR="${BINDIR}/llvm-ar"
         NM="${BINDIR}/llvm-nm"
+
         echo "${BINDIR}" >> "${GITHUB_PATH}"
-        echo "CC_x86_64_unknown_linux_gnu=${CC}" >> "${GITHUB_ENV}"
-        echo "CXX_x86_64_unknown_linux_gnu=${CXX}" >> "${GITHUB_ENV}"
-        echo "AR_x86_64_unknown_linux_gnu=${AR}" >> "${GITHUB_ENV}"
-        echo "NM_x86_64_unknown_linux_gnu=${NM}" >> "${GITHUB_ENV}"
-        echo "BUILD_CC=${CC}" >> "${GITHUB_ENV}"
-        echo "BUILD_CXX=${CXX}" >> "${GITHUB_ENV}"
-        echo "BUILD_AR=${AR}" >> "${GITHUB_ENV}"
-        echo "BUILD_NM=${NM}" >> "${GITHUB_ENV}"
+        cat <<EOF >> "${GITHUB_ENV}"
+        CC_x86_64_unknown_linux_gnu=${CC}
+        CXX_x86_64_unknown_linux_gnu=${CXX}
+        AR_x86_64_unknown_linux_gnu=${AR}
+        NM_x86_64_unknown_linux_gnu=${NM}
+        BUILD_CC=${CC}
+        BUILD_CXX=${CXX}
+        BUILD_AR=${AR}
+        BUILD_NM=${NM}
+        EOF
+
     - name: Setup Rust
       run: |
         rustup toolchain install stable
         rustup default stable
         rustup target add "${TARGET}"
         install -D "config-rusty_v8-${TARGET_CPU}.toml" ~/.cargo/config.toml
+
     - name: Setup Android NDK
       run: |
         curl -fLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip"
         unzip -d "${RUNNER_WORKSPACE}" "android-ndk-${ANDROID_NDK_VERSION}-linux.zip"
+
         ANDROID_NDK="${RUNNER_WORKSPACE}/android-ndk-${ANDROID_NDK_VERSION}"
         ANDROID_NDK_BIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         ANDROID_NDK_SYSROOT="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+        BINDGEN_EXTRA_CLANG_ARGS="--sysroot=${ANDROID_NDK_SYSROOT}"
+        CLANG_BASE_PATH="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
         CC="${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang"
         CXX="${ANDROID_NDK_BIN}/${TARGET}${ANDROID_API}-clang++"
         AR="${ANDROID_NDK_BIN}/llvm-ar"
         NM="${ANDROID_NDK_BIN}/llvm-nm"
         ln -sf "${TARGET}/asm" "${ANDROID_NDK_SYSROOT}/usr/include/asm"
-        echo "ANDROID_NDK=${ANDROID_NDK}" >> "${GITHUB_ENV}"
-        echo "ANDROID_NDK_BIN=${ANDROID_NDK_BIN}" >> "${GITHUB_ENV}"
-        echo "ANDROID_NDK_SYSROOT=${ANDROID_NDK_SYSROOT}" >> "${GITHUB_ENV}"
-        echo "BINDGEN_EXTRA_CLANG_ARGS=--sysroot=${ANDROID_NDK_SYSROOT}" >> "${GITHUB_ENV}"
-        echo "CLANG_BASE_PATH=${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64" >> "${GITHUB_ENV}"
-        echo "CC_aarch64_linux_android=${CC}" >> "${GITHUB_ENV}"
-        echo "CXX_aarch64_linux_android=${CXX}" >> "${GITHUB_ENV}"
-        echo "AR_aarch64_linux_android=${AR}" >> "${GITHUB_ENV}"
-        echo "NM_aarch64_linux_android=${NM}" >> "${GITHUB_ENV}"
-        echo "CC=${CC}" >> "${GITHUB_ENV}"
-        echo "CXX=${CXX}" >> "${GITHUB_ENV}"
-        echo "AR=${AR}" >> "${GITHUB_ENV}"
-        echo "NM=${NM}" >> "${GITHUB_ENV}"
-        echo "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=${CC}" >> "${GITHUB_ENV}"
+
+        cat <<EOF >> "${GITHUB_ENV}"
+        ANDROID_NDK=${ANDROID_NDK}
+        ANDROID_NDK_BIN=${ANDROID_NDK_BIN}
+        ANDROID_NDK_SYSROOT=${ANDROID_NDK_SYSROOT}
+        BINDGEN_EXTRA_CLANG_ARGS=${BINDGEN_EXTRA_CLANG_ARGS}
+        CLANG_BASE_PATH=${CLANG_BASE_PATH}
+        CC=${CC}
+        CXX=${CXX}
+        AR=${AR}
+        NM=${NM}
+        CC_aarch64_linux_android=${CC}
+        CXX_aarch64_linux_android=${CXX}
+        AR_aarch64_linux_android=${AR}
+        NM_aarch64_linux_android=${NM}
+        CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=${CC}
+        EOF
+
     - name: Checkout rusty_v8
       uses: actions/checkout@v4
       with:
@@ -171,22 +210,27 @@ jobs:
         ref: ${{ env.LIBRUSTY_V8_VERSION }}
         path: rusty_v8
         submodules: recursive
+
     - name: Patch rusty_v8
       run: |
         patch -d rusty_v8 -p1 < rusty_v8-cross-toolchain.patch
+        patch -d rusty_v8 -p1 < rusty_v8-compiler-rt-builtins.patch
+
     - id: cache
-      name: Cache built files
+      name: Cache build artifacts
       uses: actions/cache@v4
       with:
         key: ${{ env.LIBRUSTY_V8_VERSION }}-${{ env.TARGET_CPU }}-${{ hashFiles(format('config-rusty_v8-{0}.toml', env.TARGET_CPU), 'rusty_v8-*.patch') }}
         path: |
           ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out/obj/librusty_v8.a
           ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out/src_binding.rs
+
     - name: Build rusty_v8
       if: steps.cache.outputs.cache-hit != 'true'
       working-directory: rusty_v8
-      run: cargo +stable build --release --locked -vv
-    - name: Upload built files
+      run: cargo build --release --locked -vv
+
+    - name: Upload build artifacts
       working-directory: ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out
       env:
         GH_REPO: ${{ github.repository }}
@@ -198,60 +242,74 @@ jobs:
         ln "src_binding.rs" "${SRC_BINDING}"
         gh release upload "${TAG_NAME}" "${LIBRUSTY_V8}" "${SRC_BINDING}" --clobber
 
+
   build-deno:
     name: Build deno
+
     needs:
     - create-release
     - build-rustyv8
+
     runs-on: ubuntu-24.04-arm
+
     container:
       image: termux/termux-docker:aarch64
       options: >-
         --user "system"
         --security-opt "seccomp:unconfined"
         --ulimit "nofile=1024:65536"
-    continue-on-error: ${{ matrix.cpu == 'tensorg4' }}
+
     strategy:
       matrix:
         include:
         - { cpu: generic,  android-api: 24 }
         - { cpu: sd845,    android-api: 29 }
         - { cpu: tensorg4, android-api: 34 }
+
+    continue-on-error: ${{ matrix.cpu == 'tensorg4' }}
+
     env:
       HOME: "/data/data/com.termux/files/home"
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
-      REPOSITORY_URL: ${{ github.event.repository.clone_url }}
-      LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
-      CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
-      DENO_PANIC_VERSION: ${{ needs.create-release.outputs.DENO_PANIC_VERSION }}
-      DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
-      TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       build_alias: "aarch64-linux-android"
       HOST: "aarch64-linux-android"
       TARGET: "aarch64-linux-android"
       TARGET_CPU: ${{ matrix.cpu }}
       ANDROID_API: ${{ matrix.android-api }}
+      REPOSITORY_URL: ${{ github.event.repository.clone_url }}
+      DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
+      LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
+      CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
+      DENO_PANIC_VERSION: ${{ needs.create-release.outputs.DENO_PANIC_VERSION }}
+      DENO_WEBGPU_VERSION: ${{ needs.create-release.outputs.DENO_WEBGPU_VERSION }}
+      TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       RUSTY_V8_ARCHIVE: "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
       RUSTY_V8_SRC_BINDING_PATH: "/data/data/com.termux/files/usr/tmp/src_binding.rs"
       CARGO_BUILD_TARGET_DIR: "/data/data/com.termux/files/usr/tmp/cargo-build"
       CARGO_INSTALL_ROOT: "/data/data/com.termux/files/usr/tmp/cargo-install"
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+
     defaults:
       run:
         working-directory: "/data/data/com.termux/files/home"
         shell: bash
+
     steps:
-    - run: cat /proc/cpuinfo
+    - name: Show /proc/cpuinfo
+      run: cat /proc/cpuinfo
+
     - name: Start dnsmasq
       run: |
-        /system/bin/dnsmasq -u root -g root --no-resolv --server=1.1.1.1 --server=1.0.0.1 </dev/null &>/dev/null
+        /system/bin/dnsmasq -u root -g root --no-resolv \
+            --server=1.1.1.1 --server=1.0.0.1 </dev/null &>/dev/null
+
     - name: Install packages
       env:
         DEBIAN_FRONTEND: "noninteractive"
       run: |
-        echo 'APT::Get::Assume-Yes "true";' > "${PREFIX}/etc/apt/apt.conf.d/assumeyes"
+        echo 'APT::Get::Assume-Yes "true";' > "${PREFIX}/etc/apt/apt.conf.d/assume-yes"
         echo 'APT::Quiet "true";' > "${PREFIX}/etc/apt/apt.conf.d/quiet"
-        echo 'APT::Install-Recommends "false";' > "${PREFIX}/etc/apt/apt.conf.d/norecommends"
+        echo 'APT::Install-Recommends "false";' > "${PREFIX}/etc/apt/apt.conf.d/no-recommends"
         echo 'DPkg::Options { "--force-confdef"; "--force-confold"; };' > "${PREFIX}/etc/apt/apt.conf.d/confold"
         apt-get update
         apt-get upgrade
@@ -270,51 +328,58 @@ jobs:
             termux-elf-cleaner \
             unzip
         ln -sf "${TARGET}/asm" "${PREFIX}/include/asm"
+
     - name: Setup Android NDK
       run: |
         curl -fLO "https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux.zip"
         unzip -d "${TMPDIR}" "android-ndk-${ANDROID_NDK_VERSION}-linux.zip"
+
     - name: Checkout
       run: |
         git init .
         git remote add origin "${REPOSITORY_URL}"
         git fetch --progress --no-tags --depth=1 origin "${GITHUB_SHA}"
         git checkout --progress --force FETCH_HEAD
+
     - name: Install config.toml
       run: install -D "config-deno-${TARGET_CPU}.toml" ~/.cargo/config.toml
-    - name: Download librusty_v8.a
+
+    - name: Fetch rusty_v8
       env:
         GH_REPO: ${{ github.repository }}
         GH_TOKEN: ${{ github.token }}
         LIBRUSTY_V8_NAME: librusty_v8_${{ env.LIBRUSTY_V8_VERSION }}_${{ env.TARGET_CPU }}.a
-      run: gh release download "${TAG_NAME}" --pattern "${LIBRUSTY_V8_NAME}" --output "${RUSTY_V8_ARCHIVE}"
-    - name: Download src_binding.rs
-      env:
-        GH_REPO: ${{ github.repository }}
-        GH_TOKEN: ${{ github.token }}
         SRC_BINDING_NAME: src_binding_${{ env.LIBRUSTY_V8_VERSION }}_${{ env.TARGET_CPU }}.rs
-      run: gh release download "${TAG_NAME}" --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH}"
-    - name: Download cranelift-codegen
       run: |
-        curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | tar zxf -
-        mv "cranelift-codegen-${CRANELIFT_CODEGEN_VERSION#v}" cranelift-codegen
-    - name: Patch cranelift-codegen
-      run: patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
-    - name: Download deno_panic
+        gh release download "${TAG_NAME}" \
+            --pattern "${LIBRUSTY_V8_NAME}" --output "${RUSTY_V8_ARCHIVE}"
+        gh release download "${TAG_NAME}" \
+            --pattern "${SRC_BINDING_NAME}" --output "${RUSTY_V8_SRC_BINDING_PATH}"
+
+    - name: Fetch and patch cranelift-codegen
       run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_panic/${DENO_PANIC_VERSION#v}/download" | tar zxf -
-        mv "deno_panic-${DENO_PANIC_VERSION#v}" deno_panic
-    - name: Patch deno_panic
-      run: patch -d deno_panic -p1 < deno_panic-android.patch
-    - name: Checkout deno
-      run: git clone --depth=1 --recurse-submodules --shallow-submodules --branch="${DENO_VERSION}" https://github.com/denoland/deno.git
-    - name: Patch deno
+        curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | \
+            tar zx --strip-components=1 --one-top-level=cranelift-codegen
+        patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
+
+    - name: Fetch and patch deno_panic
       run: |
-        patch -d deno -p1 < deno-fix-webgpu-byowerror.patch
+        curl -fL "https://crates.io/api/v1/crates/deno_panic/${DENO_PANIC_VERSION#v}/download" | \
+            tar zx --strip-components=1 --one-top-level=deno_panic
+        patch -d deno_panic -p1 < deno_panic-android.patch
+
+    - name: Fetch and patch deno_webgpu
+      run: |
+        curl -fL "https://crates.io/api/v1/crates/deno_webgpu/${DENO_WEBGPU_VERSION#v}/download" | \
+            tar zx --strip-components=1 --one-top-level=deno_webgpu
+        patch -d deno_webgpu -p1 < deno_webgpu-byowerror.patch
+
     - name: Build deno
-      run: cargo install --locked -vv --path deno/cli
+      run: cargo install --version "${DENO_VERSION#v}" --locked -vv deno
+
     - name: Run termux-elf-cleaner
       run: termux-elf-cleaner --api-level "${ANDROID_API}" "${CARGO_INSTALL_ROOT}/bin/deno"
+
     - name: Upload deno
       working-directory: ${{ env.CARGO_INSTALL_ROOT }}/bin
       env:
@@ -328,12 +393,16 @@ jobs:
         fi
         gh release upload "${TAG_NAME}" "${PROGNAME}" --clobber
 
+
   publish-release:
     name: Publish GitHub Release
+
     needs:
     - create-release
     - build-deno
+
     runs-on: ubuntu-latest
+
     steps:
     - name: Publish GitHub Release
       if: needs.create-release.outputs.TAG_NAME == needs.create-release.outputs.DENO_VERSION

@@ -1,5 +1,5 @@
---- a/ext/webgpu/byow.rs
-+++ b/ext/webgpu/byow.rs
+--- a/byow.rs
++++ b/byow.rs
 @@ -24,6 +24,9 @@ use crate::surface::GPUCanvasContext;
  
  #[derive(Debug, thiserror::Error, deno_error::JsError)]

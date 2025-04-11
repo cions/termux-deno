@@ -1,0 +1,28 @@
+--- a/build/config/clang/BUILD.gn
++++ b/build/config/clang/BUILD.gn
+@@ -212,19 +212,13 @@ template("clang_lib") {
+ }
+ 
+ # Adds a dependency on the Clang runtime library clang_rt.builtins.
+-clang_lib("compiler_builtins") {
+-  if (is_mac) {
+-    libname = "osx"
+-  } else if (is_ios) {
+-    if (target_environment == "simulator") {
+-      libname = "iossim"
+-    } else if (target_environment == "catalyst") {
+-      libname = "osx"
+-    } else {
+-      libname = "ios"
+-    }
++config("compiler_builtins") {
++  if (is_android) {
++    libs = [ "$clang_base_path/lib/clang/$clang_version/lib/linux/libclang_rt.builtins-aarch64-android.a" ]
++  } else if (is_linux) {
++    libs = [ "/usr/lib/llvm-$clang_version/lib/clang/$clang_version/lib/linux/libclang_rt.builtins-x86_64.a" ]
+   } else {
+-    libname = "builtins"
++    assert(false)
+   }
+ }
+ 

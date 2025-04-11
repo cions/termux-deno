@@ -1,11 +1,14 @@
 [profile.release]
 codegen-units = 1
-debug = false
+debug = "line-tables-only"
 incremental = false
 lto = "thin"
 opt-level = 3
 split-debuginfo = "off"
-strip = "symbols"
+strip = "debuginfo"
+
+[profile.release.package.p521]
+debug = false
 
 [target."aarch64-linux-android"]
 linker = "clang"
@@ -19,6 +22,7 @@ rustflags = [
 [patch.crates-io]
 cranelift-codegen = { path = "/data/data/com.termux/files/home/cranelift-codegen" }
 deno_panic = { path = "/data/data/com.termux/files/home/deno_panic" }
+deno_webgpu = { path = "/data/data/com.termux/files/home/deno_webgpu" }
 
 [env]
 CC = "clang"
