@@ -1,6 +1,6 @@
 --- a/build/config/clang/BUILD.gn
 +++ b/build/config/clang/BUILD.gn
-@@ -212,19 +212,13 @@ template("clang_lib") {
+@@ -251,33 +251,13 @@ template("clang_lib") {
  }
  
  # Adds a dependency on the Clang runtime library clang_rt.builtins.
@@ -8,12 +8,26 @@
 -  if (is_mac) {
 -    libname = "osx"
 -  } else if (is_ios) {
--    if (target_environment == "simulator") {
--      libname = "iossim"
--    } else if (target_environment == "catalyst") {
--      libname = "osx"
+-    if (target_platform == "iphoneos") {
+-      if (target_environment == "simulator") {
+-        libname = "iossim"
+-      } else if (target_environment == "device") {
+-        libname = "ios"
+-      } else if (target_environment == "catalyst") {
+-        libname = "osx"
+-      } else {
+-        assert(false, "unsupported target_environment=$target_environment")
+-      }
+-    } else if (target_platform == "tvos") {
+-      if (target_environment == "simulator") {
+-        libname = "tvossim"
+-      } else if (target_environment == "device") {
+-        libname = "tvos"
+-      } else {
+-        assert(false, "unsupported target_environment=$target_environment")
+-      }
 -    } else {
--      libname = "ios"
+-      assert(false, "unsupported target_platform=$target_platform")
 -    }
 +config("compiler_builtins") {
 +  if (is_android) {
