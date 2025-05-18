@@ -22,8 +22,8 @@ permissions:
   contents: write
 
 env:
-  ANDROID_NDK_VERSION: "r28b"
-  LLVM_VERSION: "19"
+  ANDROID_NDK_VERSION: "r29-beta1"
+  LLVM_VERSION: "20"
 
 jobs:
   create-release:
