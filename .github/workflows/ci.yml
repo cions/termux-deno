@@ -36,7 +36,6 @@ jobs:
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
       DENO_NET_VERSION: ${{ steps.version.outputs.DENO_NET_VERSION }}
-      DENO_PANIC_VERSION: ${{ steps.version.outputs.DENO_PANIC_VERSION }}
       DENO_WEBGPU_VERSION: ${{ steps.version.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
 
@@ -65,7 +64,6 @@ jobs:
         fi
         CRANELIFT_CODEGEN_VERSION="$(deno_dep_version "cranelift-codegen")"
         DENO_NET_VERSION="$(deno_dep_version "deno_net")"
-        DENO_PANIC_VERSION="$(deno_dep_version "deno_panic")"
         DENO_WEBGPU_VERSION="$(deno_dep_version "deno_webgpu")"
 
         TAG_NAME="${DENO_VERSION}"
@@ -80,7 +78,6 @@ jobs:
         LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}
         CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}
         DENO_NET_VERSION=${DENO_NET_VERSION}
-        DENO_PANIC_VERSION=${DENO_PANIC_VERSION}
         DENO_WEBGPU_VERSION=${DENO_WEBGPU_VERSION}
         TAG_NAME=${TAG_NAME}
         EOF
@@ -284,7 +281,6 @@ jobs:
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
       DENO_NET_VERSION: ${{ needs.create-release.outputs.DENO_NET_VERSION }}
-      DENO_PANIC_VERSION: ${{ needs.create-release.outputs.DENO_PANIC_VERSION }}
       DENO_WEBGPU_VERSION: ${{ needs.create-release.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       RUSTY_V8_ARCHIVE: "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
@@ -371,12 +367,6 @@ jobs:
         curl -fL "https://crates.io/api/v1/crates/deno_net/${DENO_NET_VERSION#v}/download" | \
             tar zx --strip-components=1 --one-top-level=deno_net
         patch -d deno_net -p1 < deno_net-android.patch
-
-    - name: Fetch and patch deno_panic
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_panic/${DENO_PANIC_VERSION#v}/download" | \
-            tar zx --strip-components=1 --one-top-level=deno_panic
-        patch -d deno_panic -p1 < deno_panic-android.patch
 
     - name: Fetch and patch deno_webgpu
       run: |

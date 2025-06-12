@@ -24,7 +24,6 @@ rustflags = [
 [patch.crates-io]
 cranelift-codegen = { path = "/data/data/com.termux/files/home/cranelift-codegen" }
 deno_net = { path = "/data/data/com.termux/files/home/deno_net" }
-deno_panic = { path = "/data/data/com.termux/files/home/deno_panic" }
 deno_webgpu = { path = "/data/data/com.termux/files/home/deno_webgpu" }
 
 [env]
