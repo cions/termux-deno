@@ -35,6 +35,8 @@ jobs:
       DENO_VERSION: ${{ steps.version.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
+      DENO_FETCH_VERSION: ${{ steps.version.outputs.DENO_FETCH_VERSION }}
+      DENO_HTTP_VERSION: ${{ steps.version.outputs.DENO_HTTP_VERSION }}
       DENO_NET_VERSION: ${{ steps.version.outputs.DENO_NET_VERSION }}
       DENO_WEBGPU_VERSION: ${{ steps.version.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
@@ -63,6 +65,8 @@ jobs:
             LIBRUSTY_V8_VERSION="$(deno_dep_version "v8")"
         fi
         CRANELIFT_CODEGEN_VERSION="$(deno_dep_version "cranelift-codegen")"
+        DENO_FETCH_VERSION="$(deno_dep_version "deno_fetch")"
+        DENO_HTTP_VERSION="$(deno_dep_version "deno_http")"
         DENO_NET_VERSION="$(deno_dep_version "deno_net")"
         DENO_WEBGPU_VERSION="$(deno_dep_version "deno_webgpu")"
 
@@ -77,6 +81,8 @@ jobs:
         DENO_VERSION=${DENO_VERSION}
         LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}
         CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}
+        DENO_FETCH_VERSION=${DENO_FETCH_VERSION}
+        DENO_HTTP_VERSION=${DENO_HTTP_VERSION}
         DENO_NET_VERSION=${DENO_NET_VERSION}
         DENO_WEBGPU_VERSION=${DENO_WEBGPU_VERSION}
         TAG_NAME=${TAG_NAME}
@@ -280,6 +286,8 @@ jobs:
       DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
+      DENO_FETCH_VERSION: ${{ needs.create-release.outputs.DENO_FETCH_VERSION }}
+      DENO_HTTP_VERSION: ${{ needs.create-release.outputs.DENO_HTTP_VERSION }}
       DENO_NET_VERSION: ${{ needs.create-release.outputs.DENO_NET_VERSION }}
       DENO_WEBGPU_VERSION: ${{ needs.create-release.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
@@ -361,6 +369,18 @@ jobs:
         curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | \
             tar zx --strip-components=1 --one-top-level=cranelift-codegen
         patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
+
+    - name: Fetch and patch deno_fetch
+      run: |
+        curl -fL "https://crates.io/api/v1/crates/deno_fetch/${DENO_FETCH_VERSION#v}/download" | \
+            tar zx --strip-components=1 --one-top-level=deno_fetch
+        patch -d deno_fetch -p1 < deno_fetch-android.patch
+
+    - name: Fetch and patch deno_http
+      run: |
+        curl -fL "https://crates.io/api/v1/crates/deno_http/${DENO_HTTP_VERSION#v}/download" | \
+            tar zx --strip-components=1 --one-top-level=deno_http
+        patch -d deno_http -p1 < deno_http-android.patch
 
     - name: Fetch and patch deno_net
       run: |
