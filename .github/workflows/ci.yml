@@ -296,6 +296,7 @@ jobs:
       CARGO_BUILD_TARGET_DIR: "/data/data/com.termux/files/usr/tmp/cargo-build"
       CARGO_INSTALL_ROOT: "/data/data/com.termux/files/usr/tmp/cargo-install"
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+      CMAKE_POLICY_VERSION_MINIMUM: "3.5"
 
     defaults:
       run:
