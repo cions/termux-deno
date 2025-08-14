@@ -35,10 +35,6 @@ jobs:
       DENO_VERSION: ${{ steps.version.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ steps.version.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ steps.version.outputs.CRANELIFT_CODEGEN_VERSION }}
-      DENO_FETCH_VERSION: ${{ steps.version.outputs.DENO_FETCH_VERSION }}
-      DENO_HTTP_VERSION: ${{ steps.version.outputs.DENO_HTTP_VERSION }}
-      DENO_NET_VERSION: ${{ steps.version.outputs.DENO_NET_VERSION }}
-      DENO_WEBGPU_VERSION: ${{ steps.version.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
 
     steps:
@@ -51,7 +47,7 @@ jobs:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       run: |
         if [[ -z "${DENO_VERSION}" ]]; then
-            DENO_VERSION="v$(curl -fsSL -A "denobuilder" "https://crates.io/api/v1/crates/deno" | \
+            DENO_VERSION="v$(curl -fsSL -A "github.com/cions/termux-deno" "https://crates.io/api/v1/crates/deno" | \
                              jq -r '.crate.default_version')"
         fi
 
@@ -65,10 +61,6 @@ jobs:
             LIBRUSTY_V8_VERSION="$(deno_dep_version "v8")"
         fi
         CRANELIFT_CODEGEN_VERSION="$(deno_dep_version "cranelift-codegen")"
-        DENO_FETCH_VERSION="$(deno_dep_version "deno_fetch")"
-        DENO_HTTP_VERSION="$(deno_dep_version "deno_http")"
-        DENO_NET_VERSION="$(deno_dep_version "deno_net")"
-        DENO_WEBGPU_VERSION="$(deno_dep_version "deno_webgpu")"
 
         TAG_NAME="${DENO_VERSION}"
         if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
@@ -81,10 +73,6 @@ jobs:
         DENO_VERSION=${DENO_VERSION}
         LIBRUSTY_V8_VERSION=${LIBRUSTY_V8_VERSION}
         CRANELIFT_CODEGEN_VERSION=${CRANELIFT_CODEGEN_VERSION}
-        DENO_FETCH_VERSION=${DENO_FETCH_VERSION}
-        DENO_HTTP_VERSION=${DENO_HTTP_VERSION}
-        DENO_NET_VERSION=${DENO_NET_VERSION}
-        DENO_WEBGPU_VERSION=${DENO_WEBGPU_VERSION}
         TAG_NAME=${TAG_NAME}
         EOF
 
@@ -272,8 +260,6 @@ jobs:
         - { cpu: sd845,    android-api: 29 }
         - { cpu: tensorg4, android-api: 34 }
 
-    continue-on-error: ${{ matrix.cpu == 'tensorg4' }}
-
     env:
       HOME: "/data/data/com.termux/files/home"
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
@@ -286,10 +272,6 @@ jobs:
       DENO_VERSION: ${{ needs.create-release.outputs.DENO_VERSION }}
       LIBRUSTY_V8_VERSION: ${{ needs.create-release.outputs.LIBRUSTY_V8_VERSION }}
       CRANELIFT_CODEGEN_VERSION: ${{ needs.create-release.outputs.CRANELIFT_CODEGEN_VERSION }}
-      DENO_FETCH_VERSION: ${{ needs.create-release.outputs.DENO_FETCH_VERSION }}
-      DENO_HTTP_VERSION: ${{ needs.create-release.outputs.DENO_HTTP_VERSION }}
-      DENO_NET_VERSION: ${{ needs.create-release.outputs.DENO_NET_VERSION }}
-      DENO_WEBGPU_VERSION: ${{ needs.create-release.outputs.DENO_WEBGPU_VERSION }}
       TAG_NAME: ${{ needs.create-release.outputs.TAG_NAME }}
       RUSTY_V8_ARCHIVE: "/data/data/com.termux/files/usr/tmp/librusty_v8.a"
       RUSTY_V8_SRC_BINDING_PATH: "/data/data/com.termux/files/usr/tmp/src_binding.rs"
@@ -304,9 +286,6 @@ jobs:
         shell: bash
 
     steps:
-    - name: Show /proc/cpuinfo
-      run: cat /proc/cpuinfo
-
     - name: Start dnsmasq
       run: |
         /system/bin/dnsmasq -u root -g root --no-resolv \
@@ -370,30 +349,6 @@ jobs:
         curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | \
             tar zx --strip-components=1 --one-top-level=cranelift-codegen
         patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
-
-    - name: Fetch and patch deno_fetch
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_fetch/${DENO_FETCH_VERSION#v}/download" | \
-            tar zx --strip-components=1 --one-top-level=deno_fetch
-        patch -d deno_fetch -p1 < deno_fetch-android.patch
-
-    - name: Fetch and patch deno_http
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_http/${DENO_HTTP_VERSION#v}/download" | \
-            tar zx --strip-components=1 --one-top-level=deno_http
-        patch -d deno_http -p1 < deno_http-android.patch
-
-    - name: Fetch and patch deno_net
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_net/${DENO_NET_VERSION#v}/download" | \
-            tar zx --strip-components=1 --one-top-level=deno_net
-        patch -d deno_net -p1 < deno_net-android.patch
-
-    - name: Fetch and patch deno_webgpu
-      run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_webgpu/${DENO_WEBGPU_VERSION#v}/download" | \
-            tar zx --strip-components=1 --one-top-level=deno_webgpu
-        patch -d deno_webgpu -p1 < deno_webgpu-byowerror.patch
 
     - name: Build deno
       run: cargo install --version "${DENO_VERSION#v}" --locked -vv deno
