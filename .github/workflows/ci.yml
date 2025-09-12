@@ -279,6 +279,7 @@ jobs:
       CARGO_INSTALL_ROOT: "/data/data/com.termux/files/usr/tmp/cargo-install"
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"
       CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+      RUST_BACKTRACE: "1"
 
     defaults:
       run:
