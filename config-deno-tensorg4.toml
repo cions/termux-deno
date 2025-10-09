@@ -14,7 +14,7 @@ debug = false
 linker = "clang"
 rustflags = [
 	"-C", "default-linker-libraries=yes",
-	"-C", "linker-plugin-lto",
+#	"-C", "linker-plugin-lto",
 	"-C", "link-arg=--target=aarch64-linux-android34",
 	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/34",
 	"-C", "target-cpu=cortex-x4",
