@@ -14,9 +14,8 @@ debug = false
 linker = "clang"
 rustflags = [
 	"-C", "default-linker-libraries=yes",
-#	"-C", "linker-plugin-lto",
 	"-C", "link-arg=--target=aarch64-linux-android24",
-	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24",
+	"-C", "link-arg=-B/data/data/com.termux/files/usr/tmp/android-ndk-r29/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24",
 ]
 
 [patch.crates-io]
@@ -29,7 +28,7 @@ AR = "llvm-ar"
 NM = "llvm-nm"
 CFLAGS = "--target=aarch64-linux-android24 -O3 -flto=thin -femulated-tls"
 CXXFLAGS = "--target=aarch64-linux-android24 -O3 -flto=thin -femulated-tls"
-LDFLAGS = "--target=aarch64-linux-android24 -B/data/data/com.termux/files/usr/tmp/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24"
+LDFLAGS = "--target=aarch64-linux-android24 -B/data/data/com.termux/files/usr/tmp/android-ndk-r29/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/24"
 CXXSTDLIB = "c++_shared"
 
 GN_ARGS = "use_custom_libcxx=false"
