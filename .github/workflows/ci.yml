@@ -121,7 +121,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup LLVM
       env:
@@ -198,7 +198,7 @@ jobs:
         EOF
 
     - name: Checkout rusty_v8
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: denoland/rusty_v8
         ref: ${{ env.LIBRUSTY_V8_VERSION }}
@@ -212,12 +212,17 @@ jobs:
 
     - id: cache
       name: Cache build artifacts
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         key: ${{ env.LIBRUSTY_V8_VERSION }}-${{ env.TARGET_CPU }}-${{ hashFiles(format('config-rusty_v8-{0}.toml', env.TARGET_CPU), 'rusty_v8-*.patch') }}
         path: |
           ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out/obj/librusty_v8.a
           ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out/src_binding.rs
+
+    - name: Install sysroot
+      if: steps.cache.outputs.cache-hit != 'true'
+      working-directory: rusty_v8
+      run: build/linux/sysroot_scripts/install-sysroot.py --arch=amd64
 
     - name: Build rusty_v8
       if: steps.cache.outputs.cache-hit != 'true'
