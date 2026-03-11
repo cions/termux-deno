@@ -15,10 +15,10 @@ rustflags = [
 [env]
 CFLAGS = "-O3 -mcpu=cortex-x4 -femulated-tls"
 CXXFLAGS = "-O3 -mcpu=cortex-x4 -femulated-tls"
-BUILD_CFLAGS = "-O3 -march=native -mevex512"
-BUILD_CXXFLAGS = "-O3 -march=native -mevex512"
-CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native -mevex512"
-CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native -mevex512"
+BUILD_CFLAGS = "-O3 -march=native"
+BUILD_CXXFLAGS = "-O3 -march=native"
+CFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
+CXXFLAGS_x86_64_unknown_linux_gnu = "-O3 -march=native"
 CXXSTDLIB = "c++"
 
 V8_FROM_SOURCE = "1"
