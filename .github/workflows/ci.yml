@@ -307,12 +307,13 @@ jobs:
         apt-get update
         apt-get upgrade
         apt-get install \
-            binutils-is-llvm \
             cmake \
             curl \
             gh \
             git \
             libandroid-stub \
+            lld \
+            llvm \
             make \
             ndk-sysroot \
             patch \
