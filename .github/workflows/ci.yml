@@ -212,6 +212,7 @@ jobs:
       run: |
         patch -d rusty_v8 -p1 < rusty_v8-cross-toolchain.patch
         patch -d rusty_v8 -p1 < rusty_v8-compiler-rt-builtins.patch
+        patch -d rusty_v8 -p1 < rusty_v8-fix-unknown-options.patch
 
     - id: cache
       name: Cache build artifacts
