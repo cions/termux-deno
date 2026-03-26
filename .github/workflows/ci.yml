@@ -231,7 +231,7 @@ jobs:
     - name: Build rusty_v8
       if: steps.cache.outputs.cache-hit != 'true'
       working-directory: rusty_v8
-      run: cargo build --release --locked -vv
+      run: cargo build --release --locked --features "simdutf" -vv
 
     - name: Upload build artifacts
       working-directory: ${{ env.CARGO_BUILD_TARGET_DIR }}/${{ env.TARGET }}/release/gn_out
