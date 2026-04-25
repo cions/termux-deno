@@ -272,6 +272,7 @@ jobs:
     env:
       HOME: "/data/data/com.termux/files/home"
       SSL_CERT_FILE: "/data/data/com.termux/files/usr/etc/tls/cert.pem"
+      CONFIG_SHELL: "/data/data/com.termux/files/usr/bin/sh"
       build_alias: "aarch64-linux-android"
       HOST: "aarch64-linux-android"
       TARGET: "aarch64-linux-android"
