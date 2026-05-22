@@ -10,11 +10,21 @@
  if (current_toolchain == default_toolchain) {
 --- a/build/config/android/config.gni
 +++ b/build/config/android/config.gni
-@@ -158,6 +158,7 @@
+@@ -157,8 +157,6 @@
+     }
    }
  
-   android_ndk_root = "//third_party/android_toolchain/ndk"
-+  android_ndk_version = "r28"
- 
+-  android_ndk_root = "//third_party/android_toolchain/ndk"
+-
    public_android_sdk_root = "//third_party/android_sdk/public"
    public_android_sdk_platform_version = "37.0"
+   public_android_sdk_build_tools_version = "37.0.0"
+@@ -231,6 +229,8 @@
+          "SDK release " + android_sdk_release + " not recognized.")
+ 
+   declare_args() {
++    android_ndk_root = "//third_party/android_toolchain/ndk"
++    android_ndk_version = "r28"
+     android_ndk_api_level = default_min_sdk_version
+ 
+     if (current_cpu == "riscv64" && default_min_sdk_version < 35) {
