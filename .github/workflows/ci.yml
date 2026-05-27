@@ -359,13 +359,13 @@ jobs:
 
     - name: Fetch and patch cranelift-codegen
       run: |
-        curl -fL "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | \
+        curl -fL -A "github.com/cions/termux-deno" "https://crates.io/api/v1/crates/cranelift-codegen/${CRANELIFT_CODEGEN_VERSION#v}/download" | \
             tar zx --strip-components=1 --one-top-level=cranelift-codegen
         patch -d cranelift-codegen -p1 < cranelift-codegen-fix-rustc-segfault.patch
 
     - name: Fetch and patch deno_core
       run: |
-        curl -fL "https://crates.io/api/v1/crates/deno_core/${DENO_CORE_VERSION#v}/download" | \
+        curl -fL -A "github.com/cions/termux-deno" "https://crates.io/api/v1/crates/deno_core/${DENO_CORE_VERSION#v}/download" | \
             tar zx --strip-components=1 --one-top-level=deno_core
         patch -d deno_core -p1 < deno_core-errno_location.patch
 
