@@ -298,11 +298,6 @@ jobs:
         shell: bash
 
     steps:
-    - name: Start dnsmasq
-      run: |
-        /data/data/com.termux/files/usr/bin/dnsmasq -u root -g root --no-resolv \
-            --server=1.1.1.1 --server=1.0.0.1 </dev/null &>/dev/null
-
     - name: Install packages
       env:
         DEBIAN_FRONTEND: "noninteractive"
